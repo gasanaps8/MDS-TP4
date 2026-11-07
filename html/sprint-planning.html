@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Planning · Agile Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/sprint-planning.css">
+</head>
+<body>
+  <app-navbar></app-navbar>
+
+  <main class="fase">
+    <!-- Cabeçalho da fase -->
+    <section class="fase-cabecalho">
+      <span class="fase-numero">Fase 2</span>
+      <h1>Sprint <span class="destaque">Planning</span></h1>
+      <p>Onde a equipa escolhe a próxima missão: o que vai fazer nesta Sprint, porquê, e como.</p>
+    </section>
+
+    <!-- 1. O que é -->
+    <section class="bloco" aria-labelledby="titulo-oque">
+      <h2 id="titulo-oque">O que é a Sprint Planning?</h2>
+
+      <div class="cartoes">
+        <article class="cartao">
+          <h3>🧭 Conceito</h3>
+          <p>É o evento que dá início à Sprint. A Scrum Team planeia em conjunto o trabalho a realizar durante a Sprint.</p>
+        </article>
+        <article class="cartao">
+          <h3>🎯 Objetivo</h3>
+          <p>Responder a três perguntas:</p>
+          <ol>
+            <li><strong>Porquê</strong> é que esta Sprint é valiosa?</li>
+            <li><strong>O quê</strong> pode ser feito nesta Sprint?</li>
+            <li><strong>Como</strong> vai o trabalho ser feito?</li>
+          </ol>
+        </article>
+        <article class="cartao">
+          <h3>👥 Participantes</h3>
+          <p>Toda a Scrum Team: <strong>Product Owner</strong>, <strong>Scrum Master</strong> e <strong>Developers</strong>. Podem ser convidadas outras pessoas para dar conselhos.</p>
+        </article>
+        <article class="cartao">
+          <h3>⏱️ Duração</h3>
+          <p>Timebox de, no máximo, <strong>8 horas</strong> para uma Sprint de um mês. Em Sprints mais curtas, o evento é normalmente mais curto.</p>
+        </article>
+      </div>
+
+      <div class="fluxo" aria-label="Entrada e resultados da Sprint Planning">
+        <div class="fluxo-passo">📚<span>Product Backlog</span></div>
+        <div class="fluxo-seta" aria-hidden="true">→</div>
+        <div class="fluxo-passo fluxo-evento">🗓️<span>Sprint Planning</span></div>
+        <div class="fluxo-seta" aria-hidden="true">→</div>
+        <div class="fluxo-passo">🏁<span>Sprint Goal<br>+ Sprint Backlog</span></div>
+      </div>
+      <p class="nota">O <strong>Sprint Backlog</strong> é composto pelo Sprint Goal (o porquê), pelos itens do Product Backlog selecionados (o quê) e pelo plano para os entregar (o como).</p>
+    </section>
+
+    <!-- 2. Simulador -->
+    <section class="bloco" aria-labelledby="titulo-sim">
+      <h2 id="titulo-sim">🃏 Simulador de Planning Poker</h2>
+      <p>Fazes parte da equipa da <strong>CaféApp</strong>. Estima as user stories com os teus colegas, escolhe o que cabe na Sprint e define o Sprint Goal.</p>
+
+      <ol class="stepper" aria-label="Passos da simulação">
+        <li data-passo="1" class="ativo">1. Estimar</li>
+        <li data-passo="2">2. Planear a Sprint</li>
+        <li data-passo="3">3. Sprint Goal</li>
+      </ol>
+
+      <div id="simulador" class="simulador" aria-live="polite"></div>
+    </section>
+
+    <!-- 3. Gamificação -->
+    <section class="bloco" aria-labelledby="titulo-gam">
+      <h2 id="titulo-gam">🎮 Como gamificar a Sprint Planning</h2>
+      <div class="cartoes">
+        <article class="cartao">
+          <h3>🃏 Planning Poker</h3>
+          <p>A estimativa vira um jogo de cartas. Todos votam ao mesmo tempo, por isso todos têm voz, incluindo os mais calados.</p>
+        </article>
+        <article class="cartao">
+          <h3>🗺️ Sprint Goal como missão</h3>
+          <p>O Sprint Goal é a "quest" da Sprint. Se for cumprido, toda a equipa ganha um badge.</p>
+        </article>
+        <article class="cartao">
+          <h3>🎒 Capacidade como inventário</h3>
+          <p>Como num RPG, a mochila tem um limite. Isso torna visível quando a equipa se compromete com trabalho a mais.</p>
+        </article>
+        <article class="cartao">
+          <h3>🎯 Badge "Estimador certeiro"</h3>
+          <p>Na Sprint Review, comparam-se as estimativas com a realidade. Recompensa-se a aprendizagem da equipa, não a velocidade individual.</p>
+        </article>
+      </div>
+      <div class="cuidado" role="note">
+        <strong>⚠️ Cuidado!</strong> Nunca recompenses pessoas individualmente por story points.
+        Isso incentiva a inflacionar estimativas e as métricas deixam de ser úteis
+        (<em>Lei de Goodhart</em>: quando uma medida se torna um objetivo, deixa de ser uma boa medida).
+      </div>
+    </section>
+
+    <!-- 4. Quiz -->
+    <section class="bloco" aria-labelledby="titulo-quiz">
+      <h2 id="titulo-quiz">❓ Mini-quiz</h2>
+      <p>Responde a 3 perguntas e ganha <strong>+50 XP</strong>.</p>
+      <div id="quiz" class="quiz" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="../js/components.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/sprint-planning.js"></script>
+</body>
+</html>
