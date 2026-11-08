@@ -176,8 +176,210 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
   ])}
 `;
 
+// --- Scrum Poker: atividade interativa reutilizável ---
+// O utilizador escolhe uma carta (estimativa) para cada item do backlog;
+// o total é comparado com a capacidade da equipa, para perceber se o
+// conjunto escolhido é realista para a sprint.
+
+const CARTAS_SCRUM_POKER = [1, 2, 3, 5, 8, 13, 21, "☕"];
+
+function renderScrumPoker(idPrefix, itens, capacidade) {
+  const linhasItens = itens
+    .map(
+      (nome, indice) => `
+        <li class="poker-item" data-item="${indice}">
+          <p class="poker-item-nome">${nome}</p>
+          <div class="poker-cartas">
+            ${CARTAS_SCRUM_POKER.map(
+              (valor) => `<button type="button" class="poker-carta" data-valor="${valor}">${valor}</button>`
+            ).join("")}
+          </div>
+        </li>`
+    )
+    .join("");
+
+  return `
+    <div class="scrum-poker" id="poker-${idPrefix}" data-capacidade="${capacidade}">
+      <ul class="poker-itens">${linhasItens}</ul>
+      <div class="poker-resumo">
+        <p class="poker-total">
+          Total estimado: <strong><span class="poker-total-valor">0</span></strong> pontos
+          (capacidade da equipa: ${capacidade})
+        </p>
+        <p class="poker-mensagem" aria-live="polite"></p>
+        <button type="button" class="poker-repor">Repor votos</button>
+      </div>
+    </div>`;
+}
+
+function inicializarScrumPoker(idPrefix) {
+  const poker = document.getElementById(`poker-${idPrefix}`);
+  if (!poker || poker.dataset.inicializado) return;
+  poker.dataset.inicializado = "true";
+
+  const capacidade = Number(poker.dataset.capacidade);
+  const valores = {}; // indice do item -> valor numérico escolhido
+
+  const totalValorEl = poker.querySelector(".poker-total-valor");
+  const mensagemEl = poker.querySelector(".poker-mensagem");
+
+  function recalcular() {
+    const total = Object.values(valores).reduce((soma, v) => soma + v, 0);
+    totalValorEl.textContent = total;
+
+    if (Object.keys(valores).length === 0) {
+      mensagemEl.textContent = "";
+    } else if (total <= capacidade) {
+      mensagemEl.textContent = "✅ Cabe confortavelmente na sprint.";
+    } else {
+      mensagemEl.textContent =
+        "⚠️ Ultrapassa a capacidade da equipa — considera deixar algum item para a sprint seguinte.";
+    }
+  }
+
+  poker.querySelectorAll(".poker-item").forEach((item) => {
+    const indice = item.dataset.item;
+
+    item.querySelectorAll(".poker-carta").forEach((carta) => {
+      carta.addEventListener("click", () => {
+        item
+          .querySelectorAll(".poker-carta")
+          .forEach((c) => c.classList.remove("selecionada"));
+        carta.classList.add("selecionada");
+
+        const valorNumerico = Number(carta.dataset.valor);
+        // a carta "☕" (pausa para discutir) não entra na soma
+        valores[indice] = Number.isNaN(valorNumerico) ? 0 : valorNumerico;
+        recalcular();
+      });
+    });
+  });
+
+  poker.querySelector(".poker-repor").addEventListener("click", () => {
+    Object.keys(valores).forEach((indice) => delete valores[indice]);
+    poker
+      .querySelectorAll(".poker-carta.selecionada")
+      .forEach((carta) => carta.classList.remove("selecionada"));
+    recalcular();
+  });
+}
+
+// --- US-08: Sprint Planning ---
+
+CONTEUDO_ETAPAS["sprint-planning"] = () => `
+  <h3>🏃 Sprint Planning</h3>
+
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>O que é</h4>
+      <p>
+        A Sprint Planning é o evento que abre cada sprint: a equipa olha
+        para o topo do Product Backlog e decide o que vai fazer e como vai
+        fazê-lo durante o período da sprint.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Definir o <strong>Sprint Goal</strong> (o porquê da sprint) e
+        construir o <strong>Sprint Backlog</strong> — os itens
+        selecionados do Product Backlog, já com um plano inicial para os
+        entregar.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        Product Owner (apresenta e esclarece os itens prioritários),
+        Scrum Master (facilita o evento) e a Equipa de Desenvolvimento
+        (estima o esforço e decide o que consegue comprometer-se a
+        entregar).
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultados</h4>
+      <p>
+        Um Sprint Goal claro e um Sprint Backlog com os itens
+        selecionados, prontos para a equipa começar a trabalhar.
+      </p>
+    </div>
+  </div>
+
+  <h4>🃏 Scrum Poker: estima o esforço</h4>
+  <p>
+    Escolhe uma carta para cada item do Product Backlog abaixo. A carta
+    "☕" representa "preciso de discutir mais antes de estimar" — não entra
+    na soma. No fim, compara o total com a capacidade da equipa para
+    perceberes se o conjunto de itens é realista para a sprint.
+  </p>
+
+  ${renderScrumPoker(
+    "sprint-planning",
+    [
+      "Login de utilizador",
+      "Pesquisa de produtos",
+      "Carrinho de compras",
+      "Notificações por email",
+      "Página de perfil",
+    ],
+    20
+  )}
+
+  <h4>🎮 Gamificar a Sprint Planning</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Scrum Poker com temporizador:</strong> dá 30 segundos para
+      cada pessoa escolher a carta antes de todos revelarem em simultâneo —
+      mantém o ritmo e evita que uma opinião influencie as outras.
+    </li>
+    <li>
+      <strong>Cartão coringa "pausa para discutir":</strong> torna visível,
+      em qualquer altura, quando alguém sente que falta informação para
+      estimar com confiança.
+    </li>
+    <li>
+      <strong>Barómetro de confiança:</strong> depois de fechado o Sprint
+      Goal, cada elemento vota de 1 a 5 o quão confiante está em alcançá-lo
+      — torna riscos visíveis logo no início da sprint.
+    </li>
+  </ul>
+
+  ${renderMiniQuiz("sprint-planning", "Sprint Planning", [
+    {
+      enunciado: "O que é definido durante a Sprint Planning?",
+      opcoes: [
+        "O roadmap da próxima release",
+        "O Sprint Goal e o Sprint Backlog",
+        "As ações da próxima Retrospective",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "No Scrum Poker, para que servem as cartas?",
+      opcoes: [
+        "Para estimar o esforço relativo de cada item do backlog",
+        "Para votar na permanência do Product Owner",
+        "Para decidir a duração da sprint",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado:
+        "Porque é importante comparar a soma das estimativas com a capacidade da equipa?",
+      opcoes: [
+        "Para calcular o orçamento do projeto",
+        "Para decidir o preço de venda do produto",
+        "Para perceber se os itens escolhidos são realistas para a sprint",
+      ],
+      correta: 2,
+    },
+  ])}
+`;
+
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
-// mini-quizzes das etapas que já têm conteúdo próprio.
+// mini-quizzes e atividades interativas das etapas que já têm conteúdo
+// próprio.
 function inicializarConteudoEtapas() {
   Object.keys(CONTEUDO_ETAPAS).forEach((id) => inicializarMiniQuiz(id));
+  inicializarScrumPoker("sprint-planning");
 }
