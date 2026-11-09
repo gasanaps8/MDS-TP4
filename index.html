@@ -3,23 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Início</title>
+  <title>Agile Quest — Início</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <app-navbar></app-navbar>
 
   <main>
-    <h1>Olá, mundo!</h1>
-    <p>Esta é a página inicial do projeto.</p>
-    <input type="text" id="nome" placeholder="O teu nome">
-    <button id="btn">Guardar</button>
-    <p id="mensagem"></p>
+    <!-- US-04: header já vem do app-navbar; aqui fica a introdução à gamificação -->
+    <section class="intro">
+      <h1>🎯 Agile Quest</h1>
+      <p class="tagline">Aprende Scrum a jogar, uma etapa de cada vez.</p>
+      <p class="descricao">
+        O Agile Quest transforma a aprendizagem do Scrum numa aventura
+        gamificada: progrides por seis etapas, uma por cada evento ou
+        artefacto do framework, desbloqueando conteúdos, infografias e
+        questionários à medida que avanças — tal como uma equipa real avança
+        sprint a sprint.
+      </p>
+      <button type="button" id="btn-aventura" class="cta">Iniciar aventura</button>
+    </section>
+
+    <!-- US-05: mapa com as etapas -->
+    <section id="etapas" class="etapas-secao">
+      <h2>O teu progresso</h2>
+      <ol id="mapa-etapas" class="mapa-etapas" role="tablist" aria-label="Etapas do Scrum"></ol>
+    </section>
+
+    <!-- US-06: conteúdo da etapa selecionada no mapa acima, com navegação
+         anterior/seguinte. O mapa de etapas funciona como as tabs. -->
+    <section id="conteudo-etapa" class="conteudo-etapa">
+      <div class="tabs-nav">
+        <button type="button" id="tab-anterior" class="tab-nav-btn" aria-label="Etapa anterior">
+          &#8249;
+        </button>
+        <p class="tabs-nav-dica">Usa as setas ou clica numa etapa acima</p>
+        <button type="button" id="tab-seguinte" class="tab-nav-btn" aria-label="Etapa seguinte">
+          &#8250;
+        </button>
+      </div>
+      <div id="painel-etapas" class="painel-etapas"></div>
+    </section>
   </main>
 
   <app-footer></app-footer>
 
   <script src="js/components.js"></script>
+  <script src="js/conteudo-etapas.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

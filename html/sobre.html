@@ -3,21 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sobre</title>
+  <title>Agile Quest — Sobre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <app-navbar></app-navbar>
 
-  <main>
-    <h1>Sobre</h1>
-    <p>Segunda página do projeto.</p>
-    <p id="mensagem"></p>
+  <!-- US-14: secção "Sobre" — apresenta o projeto e a equipa -->
+  <main class="sobre">
+    <section class="intro">
+      <h1>Sobre o projeto</h1>
+      <p class="tagline">Porque é que o Agile Quest existe e quem o construiu.</p>
+    </section>
+
+    <section class="sobre-bloco" aria-labelledby="sobre-objetivo">
+      <h2 id="sobre-objetivo">🎯 O objetivo</h2>
+      <p>
+        O Agile Quest é um guia interativo que mostra como aplicar
+        <strong>gamificação</strong> em cada fase do Scrum. Em vez de ler a
+        teoria de uma só vez, o utilizador percorre as seis etapas do ciclo,
+        da Release Planning à Sprint Retrospective, e em cada uma descobre
+        o que acontece, quem participa e que mecânicas de jogo podem tornar
+        esse momento mais envolvente para a equipa.
+      </p>
+      <p>
+        A gamificação é usada de forma responsável e centrada na equipa:
+        pontos, desafios e cartas servem para motivar a colaboração, nunca
+        para criar competição individual.
+      </p>
+    </section>
+
+    <section class="sobre-bloco" aria-labelledby="sobre-como">
+      <h2 id="sobre-como">🧭 Como funciona</h2>
+      <div class="etapa-grelha">
+        <div class="etapa-cartao">
+          <h4>🗺️ Mapa de etapas</h4>
+          <p>Seis etapas do Scrum em sequência, cada uma com o seu conteúdo.</p>
+        </div>
+        <div class="etapa-cartao">
+          <h4>🃏 Atividades interativas</h4>
+          <p>Simulações como o Scrum Poker para experimentar o processo.</p>
+        </div>
+        <div class="etapa-cartao">
+          <h4>✅ Mini-quizzes</h4>
+          <p>Perguntas rápidas no fim de cada etapa para testar o que aprendeste.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sobre-bloco" aria-labelledby="sobre-equipa">
+      <h2 id="sobre-equipa">👥 A equipa</h2>
+      <p>
+        Projeto desenvolvido no âmbito da unidade curricular de
+        <strong>Metodologias de Desenvolvimento de Software</strong> (ISEC).
+      </p>
+      <ul id="lista-equipa" class="equipa-grelha"></ul>
+    </section>
+
+    <section class="sobre-bloco" aria-labelledby="sobre-refs">
+      <h2 id="sobre-refs">📚 Referências</h2>
+      <ul class="lista-referencias">
+        <li>Schwaber, K. &amp; Sutherland, J. — <em>The Scrum Guide</em> (2020).</li>
+        <li>Appelo, J. — <em>Management 3.0</em> (Kudo Cards, Moving Motivators).</li>
+        <li>Hohmann, L. — <em>Innovation Games</em> (Buy a Feature, Product Box, Sailboat).</li>
+        <li>Deterding, S. et al. — <em>From Game Design Elements to Gamefulness</em> (2011).</li>
+      </ul>
+    </section>
   </main>
 
   <app-footer></app-footer>
 
   <script src="../js/components.js"></script>
-  <script src="../js/main.js"></script>
+  <script>
+    // Membros da equipa — editar aqui (nome completo / número de aluno).
+    const EQUIPA = [
+      { nome: "Gaspar Silva", papel: "Developer" },
+      { nome: "Francisco Cardadeiro", papel: "Developer" },
+      { nome: "Rúben Baptista", papel: "Developer" },
+      { nome: "Tomás Neves", papel: "Developer" },
+      { nome: "Tomás Lopes", papel: "Developer" },
+    ];
+
+    document.getElementById("lista-equipa").innerHTML = EQUIPA.map(
+      ({ nome, papel }) => `
+        <li class="membro">
+          <span class="membro-avatar" aria-hidden="true">${nome.charAt(0)}</span>
+          <span class="membro-nome">${nome}</span>
+          <span class="membro-papel">${papel}</span>
+        </li>`
+    ).join("");
+  </script>
 </body>
 </html>
