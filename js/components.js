@@ -35,8 +35,28 @@ class AppNavbar extends HTMLElement {
 
 class AppFooter extends HTMLElement {
   connectedCallback() {
-    const ano = new Date().getFullYear();
-    this.innerHTML = `<footer><p>&copy; ${ano}</p></footer>`;
+    const equipa =
+      this.getAttribute("equipa") ||
+      "Francisco Cardadeiro, Gaspar Silva, Rubén Baptista, Tomás Lopes, Tomás Neves";
+    const uc =
+      this.getAttribute("uc") ||
+      "Metodologias de Desenvolvimento de Software";
+
+    this.innerHTML = `
+      <footer class="footer">
+        <p class="footer__item">
+          <strong>Equipa:</strong> ${equipa}
+        </p>
+
+        <a class="footer__link" href="#">
+          Referências e bibliografia
+        </a>
+
+        <p class="footer__item">
+          <strong>Unidade curricular:</strong> ${uc}
+        </p>
+      </footer>
+    `;
   }
 }
 
