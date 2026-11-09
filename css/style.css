@@ -616,7 +616,84 @@ button {
   color: var(--verde);
 }
 
+/* US-14: secção "Sobre" */
+.sobre-bloco {
+  background: #fff;
+  border: 1px solid #e8e2cc;
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 0 var(--sombra);
+}
+
+.sobre-bloco h2 {
+  color: var(--navy);
+  margin-bottom: 0.75rem;
+}
+
+.sobre-bloco p {
+  color: var(--texto);
+}
+
+.sobre-bloco p + p {
+  margin-top: 0.75rem;
+}
+
+.equipa-grelha {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.membro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--creme);
+  border: 1px solid #e8e2cc;
+  border-radius: 0.75rem;
+  padding: 1rem 0.75rem;
+}
+
+.membro-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--verde);
+  color: #fff;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.membro-nome {
+  font-weight: 700;
+}
+
+.membro-papel {
+  font-size: 0.85rem;
+  color: var(--texto);
+}
+
+.lista-referencias {
+  padding-left: 1.25rem;
+  color: var(--texto);
+}
+
+.lista-referencias li + li {
+  margin-top: 0.35rem;
+}
+
 @media (max-width: 720px) {
+  .sobre-bloco {
+    padding: 1.25rem;
+  }
   header {
     flex-direction: column;
     text-align: center;
