@@ -49,10 +49,33 @@ header {
   border-bottom: 1px solid #e8e2cc;
 }
 
-footer {
-  text-align: center;
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e8e2cc;
   color: var(--texto);
-  font-size: 0.85rem;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.footer__item strong {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.footer__link {
+  color: var(--verde);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer__link:hover {
+  text-decoration: underline;
 }
 
 .marca {
@@ -604,5 +627,9 @@ button {
   .etapa:nth-child(odd),
   .etapa:nth-child(even) {
     transform: none;
+  }
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
