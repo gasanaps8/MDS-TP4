@@ -455,6 +455,66 @@ button {
   font-size: 0.92rem;
 }
 
+/* US-09: infografia (ex.: Daily Scrum) */
+.etapa-infografia {
+  margin-top: 1.25rem;
+  background: #fff;
+  border: 1px solid #e8e2cc;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.infografia-relogio {
+  display: inline-grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--verde-claro);
+  color: var(--navy);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 0 var(--sombra);
+}
+
+.infografia-relogio strong {
+  font-size: 0.7rem;
+  font-family: "Fredoka", sans-serif;
+}
+
+.infografia-passos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.infografia-passos li {
+  flex: 1 1 180px;
+  max-width: 220px;
+  background: var(--creme);
+  border: 1px solid #e8e2cc;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+
+.infografia-icone {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.etapa-infografia figcaption {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--texto);
+  font-style: italic;
+}
+
 .lista-gamificacao strong {
   color: var(--verde);
 }
