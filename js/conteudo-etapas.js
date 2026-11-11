@@ -376,6 +376,131 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
   ])}
 `;
 
+// --- US-09: Daily Scrum ---
+// Critérios de aceitação cumpridos nesta entrada:
+//  (a) explica 5 pontos, cada um com subtítulo: conceito, objetivo,
+//      participantes, duração (15 minutos) e resultado;
+//  (b) inclui uma infografia (com legenda/título) sobre a Daily Scrum;
+//  (c) inclui um mini-quiz opcional com um máximo de 3 perguntas;
+//  (d) inclui uma secção "Gamificação" própria.
+
+CONTEUDO_ETAPAS["daily-scrum"] = () => `
+  <h3>🌀 Daily Scrum</h3>
+
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        A Daily Scrum é um evento diário, com duração fixa (timebox), em que
+        a Equipa de Desenvolvimento inspeciona o progresso em direção ao
+        Sprint Goal e ajusta o Sprint Backlog para o dia seguinte, se
+        necessário.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Sincronizar a equipa: cada elemento partilha o que fez, o que vai
+        fazer e que impedimentos encontra, para identificar obstáculos cedo
+        e ajustar o plano de trabalho do dia.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Equipa de Desenvolvimento conduz o evento; o Scrum Master garante
+        que acontece e se mantém dentro do tempo; o Product Owner pode
+        assistir, mas normalmente não participa ativamente.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        15 minutos, timeboxed — independentemente do tamanho da equipa, o
+        evento não deve ultrapassar este limite.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um plano atualizado para as próximas 24 horas e os impedimentos
+        identificados, que o Scrum Master ou a equipa tratam de resolver
+        fora do evento.
+      </p>
+    </div>
+  </div>
+
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">⏱️<br><strong>15 min</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">📋</span>
+        <strong>O que fiz ontem?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🎯</span>
+        <strong>O que vou fazer hoje?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🚧</span>
+        <strong>Tenho algum impedimento?</strong>
+        <p>Algo que me impeça, a mim ou à equipa, de alcançar o Sprint Goal.</p>
+      </li>
+    </ol>
+    <figcaption>
+      Os três pilares da Daily Scrum — respondidos por cada elemento da
+      equipa, em conjunto, em até 15 minutos.
+    </figcaption>
+  </figure>
+
+  <h4>🎮 Gamificar a Daily Scrum</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Bastão da palavra:</strong> um objeto (ou emoji, numa versão
+      digital) passa de pessoa a pessoa — só quem o tem pode falar, o que
+      mantém o ritmo e evita interrupções.
+    </li>
+    <li>
+      <strong>Cronómetro visível:</strong> uma barra de progresso dos 15
+      minutos, que muda de cor (verde → amarelo → vermelho) à medida que o
+      tempo passa, para tornar o timebox visível a todos.
+    </li>
+    <li>
+      <strong>Selo "sem impedimentos escondidos":</strong> reconhecer quem
+      reporta impedimentos cedo e com clareza — o incentivo é relatar
+      bloqueios depressa, nunca escondê-los para "parecer bem".
+    </li>
+  </ul>
+
+  ${renderMiniQuiz("daily-scrum", "Daily Scrum", [
+    {
+      enunciado: "Qual é a duração máxima da Daily Scrum?",
+      opcoes: ["15 minutos", "30 minutos", "1 hora"],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem conduz a Daily Scrum?",
+      opcoes: [
+        "O Product Owner",
+        "A Equipa de Desenvolvimento",
+        "Apenas os stakeholders",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é o principal objetivo da Daily Scrum?",
+      opcoes: [
+        "Sincronizar a equipa e identificar impedimentos cedo",
+        "Fazer a revisão do incremento com os stakeholders",
+        "Definir todo o Sprint Backlog a partir do zero",
+      ],
+      correta: 0,
+    },
+  ])}
+`;
+
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
 // mini-quizzes e atividades interativas das etapas que já têm conteúdo
 // próprio.
