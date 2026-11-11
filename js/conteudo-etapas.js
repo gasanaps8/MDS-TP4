@@ -501,6 +501,129 @@ CONTEUDO_ETAPAS["daily-scrum"] = () => `
   ])}
 `;
 
+// --- US-11: Sprint Review ---
+
+CONTEUDO_ETAPAS["sprint-review"] = () => `
+  <h3>🔍 Sprint Review</h3>
+
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        Sprint Review é um dos últimos eventos da sprint, 
+        em que a equipa apresenta o Incremento concluído
+        aos stakeholders e todos avaliam o que foi entregue.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Recolher feedback sobre o Incremento e decidir, em conjunto, como
+        adaptar o Product Backlog. Não é uma simples apresentação: é uma
+        sessão de trabalho colaborativa.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Scrum Team (Product Owner, Scrum Master e Equipa de
+        Desenvolvimento) e os stakeholders convidados, que dão feedback
+        sobre o que veem.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        No máximo 4 horas para uma sprint de um mês; nas sprints mais
+        curtas, o evento é proporcionalmente mais curto.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um Product Backlog revisto e atualizado, com o feedback dos
+        stakeholders incorporado e, se necessário, uma previsão ajustada
+        para as próximas sprints.
+      </p>
+    </div>
+  </div>
+
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">🔍<br><strong>Review</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🖥️</span>
+        <strong>Demonstrar o Incremento</strong>
+        <p>A equipa mostra o que ficou concluído (Done) na sprint.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">💬</span>
+        <strong>Recolher feedback</strong>
+        <p>Os stakeholders comentam, questionam e sugerem melhorias.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🔄</span>
+        <strong>Adaptar o Product Backlog</strong>
+        <p>O Product Owner reordena e ajusta os itens com base no que aprendeu.</p>
+      </li>
+    </ol>
+    <figcaption>
+      O ciclo da Sprint Review — mostrar, ouvir e adaptar, para a próxima
+      sprint começar com um backlog mais ajustado à realidade.
+    </figcaption>
+  </figure>
+
+  <h4>🎮 Gamificar a Sprint Review</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Feira de demonstrações:</strong> cada funcionalidade ganha
+      uma "banca" e os stakeholders circulam, experimentam e atribuem
+      estrelas (1 a 5) — torna a review mais interativa e menos passiva.
+    </li>
+    <li>
+      <strong>Moedas de feedback:</strong> cada stakeholder recebe um
+      número limitado de moedas fictícias para "investir" nas
+      funcionalidades que querem ver evoluir — revela as verdadeiras
+      prioridades para o Product Backlog.
+    </li>
+    <li>
+      <strong>Quadro de conquistas:</strong> as funcionalidades concluídas
+      e o Sprint Goal alcançado são celebrados como "conquistas
+      desbloqueadas", reforçando a motivação da equipa.
+    </li>
+  </ul>
+
+  ${renderMiniQuiz("sprint-review", "Sprint Review", [
+    {
+      enunciado: "Qual é o principal objetivo da Sprint Review?",
+      opcoes: [
+        "Inspecionar o Incremento e recolher feedback para adaptar o Product Backlog",
+        "Avaliar o desempenho individual de cada elemento da equipa",
+        "Planear em detalhe a sprint seguinte",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem participa na Sprint Review?",
+      opcoes: [
+        "Apenas a Equipa de Desenvolvimento",
+        "A Scrum Team e os stakeholders convidados",
+        "Só o Scrum Master e o Product Owner",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é um resultado típico da Sprint Review?",
+      opcoes: [
+        "A lista de melhorias de processo para a próxima sprint",
+        "O Sprint Backlog da sprint seguinte",
+        "Um Product Backlog atualizado com base no feedback recebido",
+      ],
+      correta: 2,
+    },
+  ])}
+`;
+
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
 // mini-quizzes e atividades interativas das etapas que já têm conteúdo
 // próprio.
