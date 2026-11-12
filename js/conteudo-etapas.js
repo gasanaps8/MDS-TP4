@@ -25,6 +25,7 @@ function renderMiniQuiz(idPrefix, titulo, perguntas) {
               )
               .join("")}
           </ul>
+          <p class="quiz-feedback" aria-live="polite"></p>
         </li>`
     )
     .join("");
@@ -54,7 +55,13 @@ function inicializarMiniQuiz(idPrefix) {
     perguntas.forEach((pergunta) => {
       const correta = pergunta.dataset.correta;
       const selecionada = pergunta.querySelector("input:checked");
+      const feedback = pergunta.querySelector(".quiz-feedback");
+      const opcaoCorreta = pergunta.querySelector(`input[value="${correta}"]`);
       pergunta.classList.remove("correta", "incorreta");
+      pergunta
+        .querySelectorAll(".opcao-correta")
+        .forEach((el) => el.classList.remove("opcao-correta"));
+      feedback.textContent = "";
  
       if (!selecionada) return;
       respondidas += 1;
@@ -62,8 +69,11 @@ function inicializarMiniQuiz(idPrefix) {
       if (selecionada.value === correta) {
         acertos += 1;
         pergunta.classList.add("correta");
+        feedback.textContent = "✅ Certo";
       } else {
         pergunta.classList.add("incorreta");
+        feedback.textContent = "❌ Errado — a opção correta está assinalada a verde.";
+        opcaoCorreta.closest("label").classList.add("opcao-correta");
       }
     });
  
@@ -370,6 +380,254 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
         "Para calcular o orçamento do projeto",
         "Para decidir o preço de venda do produto",
         "Para perceber se os itens escolhidos são realistas para a sprint",
+      ],
+      correta: 2,
+    },
+  ])}
+`;
+ 
+// --- US-09: Daily Scrum ---
+// Critérios de aceitação cumpridos nesta entrada:
+//  (a) explica 5 pontos, cada um com subtítulo: conceito, objetivo,
+//      participantes, duração (15 minutos) e resultado;
+//  (b) inclui uma infografia (com legenda/título) sobre a Daily Scrum;
+//  (c) inclui um mini-quiz opcional com um máximo de 3 perguntas;
+//  (d) inclui uma secção "Gamificação" própria.
+ 
+CONTEUDO_ETAPAS["daily-scrum"] = () => `
+  <h3>🌀 Daily Scrum</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        A Daily Scrum é um evento diário, com duração fixa (timebox), em que
+        a Equipa de Desenvolvimento inspeciona o progresso em direção ao
+        Sprint Goal e ajusta o Sprint Backlog para o dia seguinte, se
+        necessário.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Sincronizar a equipa: cada elemento partilha o que fez, o que vai
+        fazer e que impedimentos encontra, para identificar obstáculos cedo
+        e ajustar o plano de trabalho do dia.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Equipa de Desenvolvimento conduz o evento; o Scrum Master garante
+        que acontece e se mantém dentro do tempo; o Product Owner pode
+        assistir, mas normalmente não participa ativamente.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        15 minutos, timeboxed — independentemente do tamanho da equipa, o
+        evento não deve ultrapassar este limite.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um plano atualizado para as próximas 24 horas e os impedimentos
+        identificados, que o Scrum Master ou a equipa tratam de resolver
+        fora do evento.
+      </p>
+    </div>
+  </div>
+ 
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">⏱️<br><strong>15 min</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">📋</span>
+        <strong>O que fiz ontem?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🎯</span>
+        <strong>O que vou fazer hoje?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🚧</span>
+        <strong>Tenho algum impedimento?</strong>
+        <p>Algo que me impeça, a mim ou à equipa, de alcançar o Sprint Goal.</p>
+      </li>
+    </ol>
+    <figcaption>
+      Os três pilares da Daily Scrum — respondidos por cada elemento da
+      equipa, em conjunto, em até 15 minutos.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar a Daily Scrum</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Bastão da palavra:</strong> um objeto (ou emoji, numa versão
+      digital) passa de pessoa a pessoa — só quem o tem pode falar, o que
+      mantém o ritmo e evita interrupções.
+    </li>
+    <li>
+      <strong>Cronómetro visível:</strong> uma barra de progresso dos 15
+      minutos, que muda de cor (verde → amarelo → vermelho) à medida que o
+      tempo passa, para tornar o timebox visível a todos.
+    </li>
+    <li>
+      <strong>Selo "sem impedimentos escondidos":</strong> reconhecer quem
+      reporta impedimentos cedo e com clareza — o incentivo é relatar
+      bloqueios depressa, nunca escondê-los para "parecer bem".
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("daily-scrum", "Daily Scrum", [
+    {
+      enunciado: "Qual é a duração máxima da Daily Scrum?",
+      opcoes: ["15 minutos", "30 minutos", "1 hora"],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem conduz a Daily Scrum?",
+      opcoes: [
+        "O Product Owner",
+        "A Equipa de Desenvolvimento",
+        "Apenas os stakeholders",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é o principal objetivo da Daily Scrum?",
+      opcoes: [
+        "Sincronizar a equipa e identificar impedimentos cedo",
+        "Fazer a revisão do incremento com os stakeholders",
+        "Definir todo o Sprint Backlog a partir do zero",
+      ],
+      correta: 0,
+    },
+  ])}
+`;
+ 
+// --- US-11: Sprint Review ---
+ 
+CONTEUDO_ETAPAS["sprint-review"] = () => `
+  <h3>🔍 Sprint Review</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        Sprint Review é um dos últimos eventos da sprint, 
+        em que a equipa apresenta o Incremento concluído
+        aos stakeholders e todos avaliam o que foi entregue.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Recolher feedback sobre o Incremento e decidir, em conjunto, como
+        adaptar o Product Backlog. Não é uma simples apresentação: é uma
+        sessão de trabalho colaborativa.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Scrum Team (Product Owner, Scrum Master e Equipa de
+        Desenvolvimento) e os stakeholders convidados, que dão feedback
+        sobre o que veem.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        No máximo 4 horas para uma sprint de um mês; nas sprints mais
+        curtas, o evento é proporcionalmente mais curto.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um Product Backlog revisto e atualizado, com o feedback dos
+        stakeholders incorporado e, se necessário, uma previsão ajustada
+        para as próximas sprints.
+      </p>
+    </div>
+  </div>
+ 
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">🔍<br><strong>Review</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🖥️</span>
+        <strong>Demonstrar o Incremento</strong>
+        <p>A equipa mostra o que ficou concluído (Done) na sprint.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">💬</span>
+        <strong>Recolher feedback</strong>
+        <p>Os stakeholders comentam, questionam e sugerem melhorias.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🔄</span>
+        <strong>Adaptar o Product Backlog</strong>
+        <p>O Product Owner reordena e ajusta os itens com base no que aprendeu.</p>
+      </li>
+    </ol>
+    <figcaption>
+      O ciclo da Sprint Review — mostrar, ouvir e adaptar, para a próxima
+      sprint começar com um backlog mais ajustado à realidade.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar a Sprint Review</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Feira de demonstrações:</strong> cada funcionalidade ganha
+      uma "banca" e os stakeholders circulam, experimentam e atribuem
+      estrelas (1 a 5) — torna a review mais interativa e menos passiva.
+    </li>
+    <li>
+      <strong>Moedas de feedback:</strong> cada stakeholder recebe um
+      número limitado de moedas fictícias para "investir" nas
+      funcionalidades que querem ver evoluir — revela as verdadeiras
+      prioridades para o Product Backlog.
+    </li>
+    <li>
+      <strong>Quadro de conquistas:</strong> as funcionalidades concluídas
+      e o Sprint Goal alcançado são celebrados como "conquistas
+      desbloqueadas", reforçando a motivação da equipa.
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("sprint-review", "Sprint Review", [
+    {
+      enunciado: "Qual é o principal objetivo da Sprint Review?",
+      opcoes: [
+        "Inspecionar o Incremento e recolher feedback para adaptar o Product Backlog",
+        "Avaliar o desempenho individual de cada elemento da equipa",
+        "Planear em detalhe a sprint seguinte",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem participa na Sprint Review?",
+      opcoes: [
+        "Apenas a Equipa de Desenvolvimento",
+        "A Scrum Team e os stakeholders convidados",
+        "Só o Scrum Master e o Product Owner",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é um resultado típico da Sprint Review?",
+      opcoes: [
+        "A lista de melhorias de processo para a próxima sprint",
+        "O Sprint Backlog da sprint seguinte",
+        "Um Product Backlog atualizado com base no feedback recebido",
       ],
       correta: 2,
     },
