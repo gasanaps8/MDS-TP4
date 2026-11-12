@@ -902,4 +902,16 @@ button {
     transform: rotate(90deg);
   }
 }
- 
+
+/* --- Mini-quiz: feedback por pergunta (Certo/Errado + opção correta) --- */
+.quiz-feedback {
+  margin-top: 0.35rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.quiz-opcoes label.opcao-correta {
+  background: var(--verde-claro);
+  border-radius: 8px;
+  font-weight: 700;
+}
