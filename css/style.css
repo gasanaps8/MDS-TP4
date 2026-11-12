@@ -770,3 +770,148 @@ button {
     align-items: flex-start;
   }
 }
+
+/* --- US-10: pop-ups de termos --- */
+.termo {
+  font: inherit;
+  color: var(--verde);
+  font-weight: 700;
+  background: none;
+  border: none;
+  border-bottom: 2px dotted var(--verde);
+  padding: 0;
+  cursor: pointer;
+}
+ 
+.termo:hover,
+.termo:focus-visible {
+  background: var(--verde-claro);
+  outline: none;
+}
+ 
+.popup-termo {
+  margin: auto;
+  max-width: min(90vw, 28rem);
+  border: 2px solid var(--verde);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  background: var(--creme);
+  color: var(--navy);
+  box-shadow: 0 10px 30px rgba(27, 38, 59, 0.25);
+}
+ 
+.popup-termo::backdrop {
+  background: rgba(27, 38, 59, 0.45);
+}
+ 
+.popup-termo h4 {
+  color: var(--verde);
+  margin-bottom: 0.5rem;
+}
+ 
+.popup-termo-texto {
+  color: var(--texto);
+  margin-bottom: 1rem;
+}
+ 
+.popup-termo-fechar {
+  font: inherit;
+  font-weight: 700;
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+}
+ 
+/* --- US-10: infografia da Definition of Done --- */
+.infografia-dod {
+  margin: 0.75rem 0 1.25rem;
+}
+ 
+.dod-fluxo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.75rem;
+}
+ 
+.dod-passo {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+  background: #fff;
+  border: 2px solid #e8e2cc;
+  border-radius: 14px;
+  padding: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--texto);
+}
+ 
+.dod-passo strong {
+  color: var(--navy);
+}
+ 
+.dod-passo-icone {
+  font-size: 1.6rem;
+}
+ 
+.dod-passo-checklist {
+  border-color: var(--verde);
+}
+ 
+.dod-passo-resultado {
+  border-color: var(--dourado);
+  background: #fffaf0;
+}
+ 
+.dod-lista {
+  list-style: none;
+  text-align: left;
+  font-size: 0.85rem;
+}
+ 
+.dod-lista li::before {
+  content: "✔ ";
+  color: var(--verde);
+  font-weight: 700;
+}
+ 
+.dod-seta {
+  align-self: center;
+  font-size: 1.5rem;
+  color: var(--verde);
+}
+ 
+.infografia-dod figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--texto);
+  text-align: center;
+}
+ 
+@media (max-width: 720px) {
+  .dod-seta {
+    flex: 1 1 100%;
+    text-align: center;
+    transform: rotate(90deg);
+  }
+}
+
+/* --- Mini-quiz: feedback por pergunta (Certo/Errado + opção correta) --- */
+.quiz-feedback {
+  margin-top: 0.35rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.quiz-opcoes label.opcao-correta {
+  background: var(--verde-claro);
+  border-radius: 8px;
+  font-weight: 700;
+}

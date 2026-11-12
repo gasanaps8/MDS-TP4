@@ -3,9 +3,9 @@
 // do painel dessa etapa; quando uma etapa ainda não tem conteúdo próprio,
 // renderPaineis() (em main.js) usa o placeholder genérico.
 const CONTEUDO_ETAPAS = {};
-
+ 
 // --- Mini-quiz: gerador reutilizável (até 3 perguntas de escolha múltipla) ---
-
+ 
 function renderMiniQuiz(idPrefix, titulo, perguntas) {
   const linhas = perguntas
     .map(
@@ -25,10 +25,11 @@ function renderMiniQuiz(idPrefix, titulo, perguntas) {
               )
               .join("")}
           </ul>
+          <p class="quiz-feedback" aria-live="polite"></p>
         </li>`
     )
     .join("");
-
+ 
   return `
     <div class="mini-quiz" id="quiz-${idPrefix}">
       <h4>🧩 Mini-quiz: ${titulo}</h4>
@@ -37,50 +38,59 @@ function renderMiniQuiz(idPrefix, titulo, perguntas) {
       <p class="quiz-resultado" aria-live="polite"></p>
     </div>`;
 }
-
+ 
 function inicializarMiniQuiz(idPrefix) {
   const quiz = document.getElementById(`quiz-${idPrefix}`);
   if (!quiz || quiz.dataset.inicializado) return;
   quiz.dataset.inicializado = "true";
-
+ 
   const botao = quiz.querySelector(".quiz-verificar");
   const resultado = quiz.querySelector(".quiz-resultado");
   const perguntas = quiz.querySelectorAll(".quiz-pergunta");
-
+ 
   botao.addEventListener("click", () => {
     let acertos = 0;
     let respondidas = 0;
-
+ 
     perguntas.forEach((pergunta) => {
       const correta = pergunta.dataset.correta;
       const selecionada = pergunta.querySelector("input:checked");
+      const feedback = pergunta.querySelector(".quiz-feedback");
+      const opcaoCorreta = pergunta.querySelector(`input[value="${correta}"]`);
       pergunta.classList.remove("correta", "incorreta");
-
+      pergunta
+        .querySelectorAll(".opcao-correta")
+        .forEach((el) => el.classList.remove("opcao-correta"));
+      feedback.textContent = "";
+ 
       if (!selecionada) return;
       respondidas += 1;
-
+ 
       if (selecionada.value === correta) {
         acertos += 1;
         pergunta.classList.add("correta");
+        feedback.textContent = "✅ Certo";
       } else {
         pergunta.classList.add("incorreta");
+        feedback.textContent = "❌ Errado — a opção correta está assinalada a verde.";
+        opcaoCorreta.closest("label").classList.add("opcao-correta");
       }
     });
-
+ 
     if (respondidas < perguntas.length) {
       resultado.textContent = "Responde a todas as perguntas antes de verificar.";
       return;
     }
-
+ 
     resultado.textContent = `Acertaste ${acertos} de ${perguntas.length}.`;
   });
 }
-
+ 
 // --- US-07: Release Planning ---
-
+ 
 CONTEUDO_ETAPAS["release-planning"] = () => `
   <h3>📦 Release Planning</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>O que é</h4>
@@ -118,7 +128,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <h4>Roadmap ilustrativo</h4>
   <ol class="roadmap">
     <li><span class="roadmap-marco">1</span>Visão &amp; objetivo da release</li>
@@ -126,7 +136,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
     <li><span class="roadmap-marco">3</span>Estimativa de esforço</li>
     <li><span class="roadmap-marco">4</span>Calendarização por sprints</li>
   </ol>
-
+ 
   <h4>🎮 Gamificar a Release Planning</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -144,7 +154,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
       antes de se discutir em grupo — torna visíveis os desvios de opinião.
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("release-planning", "Release Planning", [
     {
       enunciado: "Qual é o principal objetivo da Release Planning?",
@@ -175,14 +185,14 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
     },
   ])}
 `;
-
+ 
 // --- Scrum Poker: atividade interativa reutilizável ---
 // O utilizador escolhe uma carta (estimativa) para cada item do backlog;
 // o total é comparado com a capacidade da equipa, para perceber se o
 // conjunto escolhido é realista para a sprint.
-
+ 
 const CARTAS_SCRUM_POKER = [1, 2, 3, 5, 8, 13, 21, "☕"];
-
+ 
 function renderScrumPoker(idPrefix, itens, capacidade) {
   const linhasItens = itens
     .map(
@@ -197,7 +207,7 @@ function renderScrumPoker(idPrefix, itens, capacidade) {
         </li>`
     )
     .join("");
-
+ 
   return `
     <div class="scrum-poker" id="poker-${idPrefix}" data-capacidade="${capacidade}">
       <ul class="poker-itens">${linhasItens}</ul>
@@ -211,22 +221,22 @@ function renderScrumPoker(idPrefix, itens, capacidade) {
       </div>
     </div>`;
 }
-
+ 
 function inicializarScrumPoker(idPrefix) {
   const poker = document.getElementById(`poker-${idPrefix}`);
   if (!poker || poker.dataset.inicializado) return;
   poker.dataset.inicializado = "true";
-
+ 
   const capacidade = Number(poker.dataset.capacidade);
   const valores = {}; // indice do item -> valor numérico escolhido
-
+ 
   const totalValorEl = poker.querySelector(".poker-total-valor");
   const mensagemEl = poker.querySelector(".poker-mensagem");
-
+ 
   function recalcular() {
     const total = Object.values(valores).reduce((soma, v) => soma + v, 0);
     totalValorEl.textContent = total;
-
+ 
     if (Object.keys(valores).length === 0) {
       mensagemEl.textContent = "";
     } else if (total <= capacidade) {
@@ -236,17 +246,17 @@ function inicializarScrumPoker(idPrefix) {
         "⚠️ Ultrapassa a capacidade da equipa — considera deixar algum item para a sprint seguinte.";
     }
   }
-
+ 
   poker.querySelectorAll(".poker-item").forEach((item) => {
     const indice = item.dataset.item;
-
+ 
     item.querySelectorAll(".poker-carta").forEach((carta) => {
       carta.addEventListener("click", () => {
         item
           .querySelectorAll(".poker-carta")
           .forEach((c) => c.classList.remove("selecionada"));
         carta.classList.add("selecionada");
-
+ 
         const valorNumerico = Number(carta.dataset.valor);
         // a carta "☕" (pausa para discutir) não entra na soma
         valores[indice] = Number.isNaN(valorNumerico) ? 0 : valorNumerico;
@@ -254,7 +264,7 @@ function inicializarScrumPoker(idPrefix) {
       });
     });
   });
-
+ 
   poker.querySelector(".poker-repor").addEventListener("click", () => {
     Object.keys(valores).forEach((indice) => delete valores[indice]);
     poker
@@ -263,12 +273,12 @@ function inicializarScrumPoker(idPrefix) {
     recalcular();
   });
 }
-
+ 
 // --- US-08: Sprint Planning ---
-
+ 
 CONTEUDO_ETAPAS["sprint-planning"] = () => `
   <h3>🏃 Sprint Planning</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>O que é</h4>
@@ -304,7 +314,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <h4>🃏 Scrum Poker: estima o esforço</h4>
   <p>
     Escolhe uma carta para cada item do Product Backlog abaixo. A carta
@@ -312,7 +322,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     na soma. No fim, compara o total com a capacidade da equipa para
     perceberes se o conjunto de itens é realista para a sprint.
   </p>
-
+ 
   ${renderScrumPoker(
     "sprint-planning",
     [
@@ -324,7 +334,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     ],
     20
   )}
-
+ 
   <h4>🎮 Gamificar a Sprint Planning</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -343,7 +353,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
       — torna riscos visíveis logo no início da sprint.
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("sprint-planning", "Sprint Planning", [
     {
       enunciado: "O que é definido durante a Sprint Planning?",
@@ -375,7 +385,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     },
   ])}
 `;
-
+ 
 // --- US-09: Daily Scrum ---
 // Critérios de aceitação cumpridos nesta entrada:
 //  (a) explica 5 pontos, cada um com subtítulo: conceito, objetivo,
@@ -383,10 +393,10 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
 //  (b) inclui uma infografia (com legenda/título) sobre a Daily Scrum;
 //  (c) inclui um mini-quiz opcional com um máximo de 3 perguntas;
 //  (d) inclui uma secção "Gamificação" própria.
-
+ 
 CONTEUDO_ETAPAS["daily-scrum"] = () => `
   <h3>🌀 Daily Scrum</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>Conceito</h4>
@@ -429,7 +439,7 @@ CONTEUDO_ETAPAS["daily-scrum"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <figure class="etapa-infografia">
     <div class="infografia-relogio" aria-hidden="true">⏱️<br><strong>15 min</strong></div>
     <ol class="infografia-passos">
@@ -454,7 +464,7 @@ CONTEUDO_ETAPAS["daily-scrum"] = () => `
       equipa, em conjunto, em até 15 minutos.
     </figcaption>
   </figure>
-
+ 
   <h4>🎮 Gamificar a Daily Scrum</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -473,7 +483,7 @@ CONTEUDO_ETAPAS["daily-scrum"] = () => `
       bloqueios depressa, nunca escondê-los para "parecer bem".
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("daily-scrum", "Daily Scrum", [
     {
       enunciado: "Qual é a duração máxima da Daily Scrum?",
@@ -500,12 +510,12 @@ CONTEUDO_ETAPAS["daily-scrum"] = () => `
     },
   ])}
 `;
-
+ 
 // --- US-11: Sprint Review ---
-
+ 
 CONTEUDO_ETAPAS["sprint-review"] = () => `
   <h3>🔍 Sprint Review</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>Conceito</h4>
@@ -547,7 +557,7 @@ CONTEUDO_ETAPAS["sprint-review"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <figure class="etapa-infografia">
     <div class="infografia-relogio" aria-hidden="true">🔍<br><strong>Review</strong></div>
     <ol class="infografia-passos">
@@ -572,7 +582,7 @@ CONTEUDO_ETAPAS["sprint-review"] = () => `
       sprint começar com um backlog mais ajustado à realidade.
     </figcaption>
   </figure>
-
+ 
   <h4>🎮 Gamificar a Sprint Review</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -592,7 +602,7 @@ CONTEUDO_ETAPAS["sprint-review"] = () => `
       desbloqueadas", reforçando a motivação da equipa.
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("sprint-review", "Sprint Review", [
     {
       enunciado: "Qual é o principal objetivo da Sprint Review?",
@@ -623,11 +633,198 @@ CONTEUDO_ETAPAS["sprint-review"] = () => `
     },
   ])}
 `;
-
+ 
+// --- Pop-ups "saber mais": termos destacados que abrem uma caixa com a definição ---
+// Uso: renderTermo("chave", "texto visível") dentro do HTML de uma etapa.
+// A definição de cada termo vive em TERMOS_POPUP.
+ 
+const TERMOS_POPUP = {
+  "sprint-backlog": {
+    titulo: "Sprint Backlog",
+    texto:
+      "É a lista de itens do Product Backlog escolhidos para a sprint, mais o plano da equipa para os entregar. Pertence à Equipa de Desenvolvimento e vai sendo atualizado durante a sprint.",
+  },
+  "daily-scrum": {
+    titulo: "Daily Scrum",
+    texto:
+      "Reunião diária de 15 minutos em que a Equipa de Desenvolvimento verifica o progresso rumo ao Sprint Goal e ajusta o plano para as próximas 24 horas.",
+  },
+  incremento: {
+    titulo: "Incremento",
+    texto:
+      "É um passo concreto rumo ao Sprint Goal. Cada incremento soma-se a todos os anteriores e tem de estar utilizável, mesmo que o Product Owner decida não o lançar logo.",
+  },
+  "definition-of-done": {
+    titulo: "Definition of Done",
+    texto:
+      "Descrição formal, acordada pela equipa, do que tem de ser verdade para um item se poder considerar concluído. Se um item não cumpre a Definition of Done, não é um incremento e volta ao Product Backlog.",
+  },
+};
+ 
+function renderTermo(chave, texto) {
+  return `<button type="button" class="termo" data-termo="${chave}">${texto}</button>`;
+}
+ 
+function inicializarPopups() {
+  if (document.body.dataset.popupsInicializados) return;
+  document.body.dataset.popupsInicializados = "true";
+ 
+  const dialogo = document.createElement("dialog");
+  dialogo.className = "popup-termo";
+  dialogo.setAttribute("aria-labelledby", "popup-termo-titulo");
+  dialogo.innerHTML = `
+    <h4 id="popup-termo-titulo"></h4>
+    <p class="popup-termo-texto"></p>
+    <button type="button" class="popup-termo-fechar">Fechar</button>`;
+  document.body.appendChild(dialogo);
+ 
+  const tituloEl = dialogo.querySelector("#popup-termo-titulo");
+  const textoEl = dialogo.querySelector(".popup-termo-texto");
+ 
+  dialogo
+    .querySelector(".popup-termo-fechar")
+    .addEventListener("click", () => dialogo.close());
+  // clicar fora da caixa também fecha
+  dialogo.addEventListener("click", (evento) => {
+    if (evento.target === dialogo) dialogo.close();
+  });
+ 
+  document.addEventListener("click", (evento) => {
+    const botao = evento.target.closest(".termo");
+    if (!botao) return;
+    const termo = TERMOS_POPUP[botao.dataset.termo];
+    if (!termo) return;
+    tituloEl.textContent = termo.titulo;
+    textoEl.textContent = termo.texto;
+    dialogo.showModal();
+  });
+}
+ 
+// --- US-10: Development ---
+ 
+CONTEUDO_ETAPAS["development"] = () => `
+  <h3>💻 Development</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Desenvolvimento durante a Sprint</h4>
+      <p>
+        Depois da Sprint Planning, a equipa trabalha nos itens do
+        ${renderTermo("sprint-backlog", "Sprint Backlog")} até ao fim da
+        sprint. Não há um "chefe" que distribui tarefas: a equipa
+        organiza-se sozinha e sincroniza-se na
+        ${renderTermo("daily-scrum", "Daily Scrum")}.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Incremento</h4>
+      <p>
+        O ${renderTermo("incremento", "Incremento")} é o resultado utilizável
+        da sprint: a soma de todos os itens concluídos, juntamente com os
+        incrementos das sprints anteriores. Funciona, está integrado e
+        pode ser mostrado ao cliente.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Definition of Done</h4>
+      <p>
+        A ${renderTermo("definition-of-done", "Definition of Done")} é a
+        lista que a equipa acorda para saber quando um item está mesmo
+        pronto. Um item só conta para o Incremento se cumprir todos os
+        pontos dessa lista.
+      </p>
+    </div>
+  </div>
+ 
+  <h4>📊 Infografia: da tarefa ao Incremento</h4>
+  <figure class="infografia-dod">
+    <div class="dod-fluxo">
+      <div class="dod-passo">
+        <span class="dod-passo-icone" aria-hidden="true">📝</span>
+        <strong>Item do Sprint Backlog</strong>
+        <span>Ex.: "Criar o footer da página"</span>
+      </div>
+      <span class="dod-seta" aria-hidden="true">➜</span>
+      <div class="dod-passo dod-passo-checklist">
+        <span class="dod-passo-icone" aria-hidden="true">✅</span>
+        <strong>Definition of Done</strong>
+        <ul class="dod-lista">
+          <li>Código revisto por outro membro</li>
+          <li>Testado no browser (telemóvel e computador)</li>
+          <li>Integrado no ramo <code>dev</code></li>
+          <li>Publicado no Netlify</li>
+          <li>Critérios de aceitação cumpridos</li>
+        </ul>
+      </div>
+      <span class="dod-seta" aria-hidden="true">➜</span>
+      <div class="dod-passo dod-passo-resultado">
+        <span class="dod-passo-icone" aria-hidden="true">🎁</span>
+        <strong>Incremento</strong>
+        <span>Parte do produto, pronta a mostrar na Sprint Review</span>
+      </div>
+    </div>
+    <figcaption>
+      Um item só entra no Incremento depois de cumprir todos os pontos da
+      Definition of Done. Se falhar um só ponto, volta ao Product Backlog.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar o desenvolvimento</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Checklist de selos:</strong> cada ponto da Definition of Done
+      dá um selo; um item só fica "dourado" quando reúne todos os selos —
+      torna o conceito de "concluído" visível e partilhado.
+    </li>
+    <li>
+      <strong>Quadro de missões:</strong> apresentar o Sprint Backlog como
+      um quadro de missões (a fazer, em curso, concluída), onde a equipa
+      avança as cartas em conjunto.
+    </li>
+    <li>
+      <strong>Barra de progresso do Sprint Goal:</strong> uma barra que
+      enche à medida que os itens passam a "Done", para a equipa ver
+      quanto falta, sem competição entre pessoas.
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("development", "Development", [
+    {
+      enunciado: "O que é o Incremento?",
+      opcoes: [
+        "A lista de tarefas ainda por fazer na sprint",
+        "O resultado utilizável da sprint, que soma os itens concluídos",
+        "O relatório que o Scrum Master entrega no fim da sprint",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Quando é que um item pode ser considerado concluído?",
+      opcoes: [
+        "Quando o developer acha que acabou o seu código",
+        "Quando o Product Owner tem pressa de o ter",
+        "Quando cumpre todos os pontos da Definition of Done",
+      ],
+      correta: 2,
+    },
+    {
+      enunciado: "O que acontece a um item que não cumpre a Definition of Done?",
+      opcoes: [
+        "Volta ao Product Backlog e não entra no Incremento",
+        "Entra no Incremento com um aviso",
+        "É apagado do projeto",
+      ],
+      correta: 0,
+    },
+  ])}
+`;
+ 
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
 // mini-quizzes e atividades interativas das etapas que já têm conteúdo
 // próprio.
 function inicializarConteudoEtapas() {
   Object.keys(CONTEUDO_ETAPAS).forEach((id) => inicializarMiniQuiz(id));
   inicializarScrumPoker("sprint-planning");
+  inicializarPopups();
 }
+ 
