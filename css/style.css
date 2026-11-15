@@ -915,3 +915,238 @@ button {
   border-radius: 8px;
   font-weight: 700;
 }
+
+.gamificacao-destaque {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 2px solid var(--verde, #007a4d);
+  border-radius: 20px;
+  background: rgba(181, 240, 209, 0.25);
+  box-shadow: 0 5px 0 var(--sombra, #d6d1c2);
+}
+
+.gamificacao-destaque > h4 {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1.5rem;
+  color: var(--verde, #007a4d);
+  margin-bottom: 0.5rem;
+}
+
+.gamificacao-intro {
+  margin-bottom: 1.25rem;
+  color: var(--texto, #4a5060);
+}
+
+.gamificacao-cartao {
+  background: #fff;
+}
+
+.gamificacao-porque {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--sombra, #d6d1c2);
+  font-size: 0.95rem;
+  color: var(--verde, #007a4d);
+}
+
+.gamificacao-aviso {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 5px solid var(--dourado, #f5b025);
+  border-radius: 8px;
+  background: #fff8e1;
+  font-size: 0.95rem;
+}
+
+/* Votação por pontos */
+.votacao-pontos {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid var(--sombra, #d6d1c2);
+}
+
+.votacao-restantes {
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.votacao-itens {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.votacao-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.votacao-item.com-votos {
+  border-color: var(--verde, #007a4d);
+  background: rgba(181, 240, 209, 0.35);
+}
+
+.votacao-controlos {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.votacao-controlos button {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--verde, #007a4d);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.votacao-controlos button:disabled {
+  background: var(--sombra, #d6d1c2);
+  cursor: not-allowed;
+}
+
+.votacao-valor {
+  min-width: 1.5rem;
+  text-align: center;
+  font-weight: 800;
+}
+
+.votacao-mensagem {
+  min-height: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  color: var(--verde, #007a4d);
+}
+
+.votacao-repor {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 999px;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Votação a duas pessoas: cabeçalho, ações e resultados */
+.votacao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.votacao-cabecalho p {
+  margin: 0;
+}
+
+.votacao-votante {
+  color: var(--verde, #007a4d);
+}
+
+.votacao-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.votacao-acoes button {
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--verde, #007a4d);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--sombra, #d6d1c2);
+}
+
+.votacao-acoes button:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--sombra, #d6d1c2);
+}
+
+.votacao-resultados h5 {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.resultado-lista {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.resultado-linha {
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 12px;
+}
+
+.resultado-linha.resultado-topo {
+  border-color: var(--dourado, #f5b025);
+  background: #fff8e1;
+}
+
+.resultado-texto {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.resultado-nome {
+  font-weight: 700;
+}
+
+.resultado-detalhe {
+  font-size: 0.9rem;
+  color: var(--texto, #4a5060);
+}
+
+.resultado-barra {
+  height: 10px;
+  border-radius: 999px;
+  background: #ece7d6;
+  overflow: hidden;
+}
+
+.resultado-barra-cheia {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--verde, #007a4d);
+  transition: width 0.4s;
+}
+
+.resultado-conclusao {
+  margin-bottom: 1rem;
+  font-weight: 800;
+  color: var(--verde, #007a4d);
+}
+
+.votacao-repor {
+  margin-top: 0.5rem;
+}
+
+.votacao-pontos [hidden] {
+  display: none ;
+}
