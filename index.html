@@ -30,7 +30,10 @@
     <!-- US-05: mapa com as etapas -->
     <section id="etapas" class="etapas-secao">
       <h2>O teu progresso</h2>
-      <ol id="mapa-etapas" class="mapa-etapas" role="tablist" aria-label="Etapas do Scrum"></ol>
+      <div class="mapa-wrapper">
+        <svg id="mapa-caminho" class="mapa-caminho" aria-hidden="true"></svg>
+        <ol id="mapa-etapas" class="mapa-etapas" role="tablist" aria-label="Etapas do Scrum"></ol>
+      </div>
     </section>
 
     <!-- US-06: conteúdo da etapa selecionada no mapa acima, com navegação
