@@ -6,7 +6,6 @@ class AppNavbar extends HTMLElement {
   connectedCallback() {
     const links = [
       { texto: "Início", href: "index.html" },
-      { texto: "Etapas", href: "index.html#etapas" },
       { texto: "Sobre", href: "html/sobre.html" },
     ];
 
@@ -37,7 +36,7 @@ class AppFooter extends HTMLElement {
   connectedCallback() {
     const equipa =
       this.getAttribute("equipa") ||
-      "Francisco Cardadeiro, Gaspar Silva, Rubén Baptista, Tomás Lopes, Tomás Neves";
+      "Francisco Cardadeiro, Gaspar Silva, Rúben Baptista, Tomás Lopes, Tomás Neves";
     const uc =
       this.getAttribute("uc") ||
       "Metodologias de Desenvolvimento de Software";
