@@ -218,6 +218,186 @@ button {
   margin-bottom: 1.5rem;
   color: var(--navy);
 }
+/* Contentor relativo para sobrepor os círculos ao SVG */
+.mapa-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem 0 2.5rem;
+}
+
+/* SVG por trás das etapas */
+.mapa-caminho {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Estilo do tracejado */
+.caminho-segmento {
+  fill: none;
+  stroke: #cbd5e1; /* cinza suave para etapas futuras */
+  stroke-width: 4;
+  stroke-dasharray: 8 8;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+
+.caminho-segmento.concluido {
+  stroke: #2563eb; /* azul para etapas já concluídas */
+}
+
+/* Lista das 6 etapas numa única fila horizontal */
+.mapa-etapas {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Efeito de ONDA: etapas pares descem, ímpares ficam em cima */
+.mapa-etapas .etapa:nth-child(odd) {
+  transform: translateY(0px);
+}
+
+.mapa-etapas .etapa:nth-child(even) {
+  transform: translateY(42px);
+}
+
+.etapa-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  padding: 0.25rem;
+  font-family: inherit;
+}
+
+.etapa-numero {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background-color: #ffffff;
+  border: 4px solid #e2e8f0;
+  color: #94a3b8;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.etapa-btn:hover .etapa-numero {
+  transform: scale(1.08);
+}
+
+/* Estado: Etapa Concluída */
+.etapa.concluida .etapa-numero {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+/* Estado: Etapa Atual (Selecionada) */
+.etapa.atual .etapa-numero {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.etapa-nome {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.etapa.atual .etapa-nome {
+  color: #0f172a;
+}
+
+/* 1. Remove a linha reta pontilhada antiga, se existir */
+.mapa-etapas::before,
+.mapa-etapas::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* 2. Garante que as 6 etapas ficam lado a lado na mesma fila */
+.mapa-etapas {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  flex-wrap: nowrap !important;
+  align-items: start;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: relative;
+  z-index: 2; /* Fica sempre ACIMA do SVG */
+}
+
+/* 3. Anula larguras antigas dos <li> para não quebrar a linha */
+.mapa-etapas .etapa {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  flex: unset !important;
+  margin: 0 !important;
+}
+
+/* Efeito de onda (1, 3, 5 em cima | 2, 4, 6 em baixo) */
+.mapa-etapas .etapa:nth-child(odd) {
+  transform: translateY(0px);
+}
+
+.mapa-etapas .etapa:nth-child(even) {
+  transform: translateY(42px);
+}
+
+/* 4. Garante que o círculo tem fundo opaco e fica por cima da linha tracejada */
+.etapa-numero {
+  position: relative;
+  z-index: 3;
+  background-color: #ffffff;
+}
+
+/* 5. Mantém o SVG sempre por trás dos círculos */
+.mapa-caminho {
+  z-index: 1 !important;
+}
+
+/* Responsividade para telemóveis (3 colunas x 2 linhas) */
+@media (max-width: 720px) {
+  .mapa-etapas {
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 3.5rem;
+  }
+
+  .mapa-etapas .etapa:nth-child(even) {
+    transform: translateY(24px);
+  }
+}
 
 .mapa-etapas {
   position: relative;
@@ -330,35 +510,52 @@ button {
   margin-top: 2rem;
 }
 
+
+/* US-06: Navegação entre etapas */
+
 .tabs-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-.tabs-nav-dica {
-  font-size: 0.85rem;
-  color: var(--texto);
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
 }
 
 .tab-nav-btn {
-  flex: 0 0 auto;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  border: 2px solid var(--sombra);
-  background: #fff;
-  font-size: 1.1rem;
-  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.2rem;
+  border: 2px solid var(--verde);
+  border-radius: 999px;
+  background: var(--verde);
+  color: #fff;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .tab-nav-btn:hover {
-  border-color: var(--verde);
-  color: var(--verde);
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 var(--sombra);
+}
+
+.tab-nav-btn span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.tab-nav-btn[hidden] {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .tab-nav-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
 }
 
 .painel-etapas {
@@ -453,6 +650,66 @@ button {
 
 .lista-gamificacao li {
   font-size: 0.92rem;
+}
+
+/* US-09: infografia (ex.: Daily Scrum) */
+.etapa-infografia {
+  margin-top: 1.25rem;
+  background: #fff;
+  border: 1px solid #e8e2cc;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.infografia-relogio {
+  display: inline-grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--verde-claro);
+  color: var(--navy);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 0 var(--sombra);
+}
+
+.infografia-relogio strong {
+  font-size: 0.7rem;
+  font-family: "Fredoka", sans-serif;
+}
+
+.infografia-passos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.infografia-passos li {
+  flex: 1 1 180px;
+  max-width: 220px;
+  background: var(--creme);
+  border: 1px solid #e8e2cc;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+
+.infografia-icone {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.etapa-infografia figcaption {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--texto);
+  font-style: italic;
 }
 
 .lista-gamificacao strong {
@@ -709,4 +966,384 @@ button {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* --- US-10: pop-ups de termos --- */
+.termo {
+  font: inherit;
+  color: var(--verde);
+  font-weight: 700;
+  background: none;
+  border: none;
+  border-bottom: 2px dotted var(--verde);
+  padding: 0;
+  cursor: pointer;
+}
+ 
+.termo:hover,
+.termo:focus-visible {
+  background: var(--verde-claro);
+  outline: none;
+}
+ 
+.popup-termo {
+  margin: auto;
+  max-width: min(90vw, 28rem);
+  border: 2px solid var(--verde);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  background: var(--creme);
+  color: var(--navy);
+  box-shadow: 0 10px 30px rgba(27, 38, 59, 0.25);
+}
+ 
+.popup-termo::backdrop {
+  background: rgba(27, 38, 59, 0.45);
+}
+ 
+.popup-termo h4 {
+  color: var(--verde);
+  margin-bottom: 0.5rem;
+}
+ 
+.popup-termo-texto {
+  color: var(--texto);
+  margin-bottom: 1rem;
+}
+ 
+.popup-termo-fechar {
+  font: inherit;
+  font-weight: 700;
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+}
+ 
+/* --- US-10: infografia da Definition of Done --- */
+.infografia-dod {
+  margin: 0.75rem 0 1.25rem;
+}
+ 
+.dod-fluxo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.75rem;
+}
+ 
+.dod-passo {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+  background: #fff;
+  border: 2px solid #e8e2cc;
+  border-radius: 14px;
+  padding: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--texto);
+}
+ 
+.dod-passo strong {
+  color: var(--navy);
+}
+ 
+.dod-passo-icone {
+  font-size: 1.6rem;
+}
+ 
+.dod-passo-checklist {
+  border-color: var(--verde);
+}
+ 
+.dod-passo-resultado {
+  border-color: var(--dourado);
+  background: #fffaf0;
+}
+ 
+.dod-lista {
+  list-style: none;
+  text-align: left;
+  font-size: 0.85rem;
+}
+ 
+.dod-lista li::before {
+  content: "✔ ";
+  color: var(--verde);
+  font-weight: 700;
+}
+ 
+.dod-seta {
+  align-self: center;
+  font-size: 1.5rem;
+  color: var(--verde);
+}
+ 
+.infografia-dod figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--texto);
+  text-align: center;
+}
+ 
+@media (max-width: 720px) {
+  .dod-seta {
+    flex: 1 1 100%;
+    text-align: center;
+    transform: rotate(90deg);
+  }
+}
+
+/* --- Mini-quiz: feedback por pergunta (Certo/Errado + opção correta) --- */
+.quiz-feedback {
+  margin-top: 0.35rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.quiz-opcoes label.opcao-correta {
+  background: var(--verde-claro);
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.gamificacao-destaque {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 2px solid var(--verde, #007a4d);
+  border-radius: 20px;
+  background: rgba(181, 240, 209, 0.25);
+  box-shadow: 0 5px 0 var(--sombra, #d6d1c2);
+}
+
+.gamificacao-destaque > h4 {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1.5rem;
+  color: var(--verde, #007a4d);
+  margin-bottom: 0.5rem;
+}
+
+.gamificacao-intro {
+  margin-bottom: 1.25rem;
+  color: var(--texto, #4a5060);
+}
+
+.gamificacao-cartao {
+  background: #fff;
+}
+
+.gamificacao-porque {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--sombra, #d6d1c2);
+  font-size: 0.95rem;
+  color: var(--verde, #007a4d);
+}
+
+.gamificacao-aviso {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 5px solid var(--dourado, #f5b025);
+  border-radius: 8px;
+  background: #fff8e1;
+  font-size: 0.95rem;
+}
+
+/* Votação por pontos */
+.votacao-pontos {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid var(--sombra, #d6d1c2);
+}
+
+.votacao-restantes {
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.votacao-itens {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.votacao-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.votacao-item.com-votos {
+  border-color: var(--verde, #007a4d);
+  background: rgba(181, 240, 209, 0.35);
+}
+
+.votacao-controlos {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.votacao-controlos button {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--verde, #007a4d);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.votacao-controlos button:disabled {
+  background: var(--sombra, #d6d1c2);
+  cursor: not-allowed;
+}
+
+.votacao-valor {
+  min-width: 1.5rem;
+  text-align: center;
+  font-weight: 800;
+}
+
+.votacao-mensagem {
+  min-height: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  color: var(--verde, #007a4d);
+}
+
+.votacao-repor {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 999px;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Votação a duas pessoas: cabeçalho, ações e resultados */
+.votacao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.votacao-cabecalho p {
+  margin: 0;
+}
+
+.votacao-votante {
+  color: var(--verde, #007a4d);
+}
+
+.votacao-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.votacao-acoes button {
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--verde, #007a4d);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--sombra, #d6d1c2);
+}
+
+.votacao-acoes button:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--sombra, #d6d1c2);
+}
+
+.votacao-resultados h5 {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.resultado-lista {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.resultado-linha {
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--sombra, #d6d1c2);
+  border-radius: 12px;
+}
+
+.resultado-linha.resultado-topo {
+  border-color: var(--dourado, #f5b025);
+  background: #fff8e1;
+}
+
+.resultado-texto {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.resultado-nome {
+  font-weight: 700;
+}
+
+.resultado-detalhe {
+  font-size: 0.9rem;
+  color: var(--texto, #4a5060);
+}
+
+.resultado-barra {
+  height: 10px;
+  border-radius: 999px;
+  background: #ece7d6;
+  overflow: hidden;
+}
+
+.resultado-barra-cheia {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--verde, #007a4d);
+  transition: width 0.4s;
+}
+
+.resultado-conclusao {
+  margin-bottom: 1rem;
+  font-weight: 800;
+  color: var(--verde, #007a4d);
+}
+
+.votacao-repor {
+  margin-top: 0.5rem;
+}
+
+.votacao-pontos [hidden] {
+  display: none ;
 }

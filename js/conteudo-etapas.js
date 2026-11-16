@@ -3,9 +3,9 @@
 // do painel dessa etapa; quando uma etapa ainda não tem conteúdo próprio,
 // renderPaineis() (em main.js) usa o placeholder genérico.
 const CONTEUDO_ETAPAS = {};
-
+ 
 // --- Mini-quiz: gerador reutilizável (até 3 perguntas de escolha múltipla) ---
-
+ 
 function renderMiniQuiz(idPrefix, titulo, perguntas) {
   const linhas = perguntas
     .map(
@@ -25,10 +25,11 @@ function renderMiniQuiz(idPrefix, titulo, perguntas) {
               )
               .join("")}
           </ul>
+          <p class="quiz-feedback" aria-live="polite"></p>
         </li>`
     )
     .join("");
-
+ 
   return `
     <div class="mini-quiz" id="quiz-${idPrefix}">
       <h4>🧩 Mini-quiz: ${titulo}</h4>
@@ -37,50 +38,59 @@ function renderMiniQuiz(idPrefix, titulo, perguntas) {
       <p class="quiz-resultado" aria-live="polite"></p>
     </div>`;
 }
-
+ 
 function inicializarMiniQuiz(idPrefix) {
   const quiz = document.getElementById(`quiz-${idPrefix}`);
   if (!quiz || quiz.dataset.inicializado) return;
   quiz.dataset.inicializado = "true";
-
+ 
   const botao = quiz.querySelector(".quiz-verificar");
   const resultado = quiz.querySelector(".quiz-resultado");
   const perguntas = quiz.querySelectorAll(".quiz-pergunta");
-
+ 
   botao.addEventListener("click", () => {
     let acertos = 0;
     let respondidas = 0;
-
+ 
     perguntas.forEach((pergunta) => {
       const correta = pergunta.dataset.correta;
       const selecionada = pergunta.querySelector("input:checked");
+      const feedback = pergunta.querySelector(".quiz-feedback");
+      const opcaoCorreta = pergunta.querySelector(`input[value="${correta}"]`);
       pergunta.classList.remove("correta", "incorreta");
-
+      pergunta
+        .querySelectorAll(".opcao-correta")
+        .forEach((el) => el.classList.remove("opcao-correta"));
+      feedback.textContent = "";
+ 
       if (!selecionada) return;
       respondidas += 1;
-
+ 
       if (selecionada.value === correta) {
         acertos += 1;
         pergunta.classList.add("correta");
+        feedback.textContent = "✅ Certo";
       } else {
         pergunta.classList.add("incorreta");
+        feedback.textContent = "❌ Errado — a opção correta está assinalada a verde.";
+        opcaoCorreta.closest("label").classList.add("opcao-correta");
       }
     });
-
+ 
     if (respondidas < perguntas.length) {
       resultado.textContent = "Responde a todas as perguntas antes de verificar.";
       return;
     }
-
+ 
     resultado.textContent = `Acertaste ${acertos} de ${perguntas.length}.`;
   });
 }
-
+ 
 // --- US-07: Release Planning ---
-
+ 
 CONTEUDO_ETAPAS["release-planning"] = () => `
   <h3>📦 Release Planning</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>O que é</h4>
@@ -118,7 +128,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <h4>Roadmap ilustrativo</h4>
   <ol class="roadmap">
     <li><span class="roadmap-marco">1</span>Visão &amp; objetivo da release</li>
@@ -126,7 +136,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
     <li><span class="roadmap-marco">3</span>Estimativa de esforço</li>
     <li><span class="roadmap-marco">4</span>Calendarização por sprints</li>
   </ol>
-
+ 
   <h4>🎮 Gamificar a Release Planning</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -144,7 +154,7 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
       antes de se discutir em grupo — torna visíveis os desvios de opinião.
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("release-planning", "Release Planning", [
     {
       enunciado: "Qual é o principal objetivo da Release Planning?",
@@ -175,14 +185,14 @@ CONTEUDO_ETAPAS["release-planning"] = () => `
     },
   ])}
 `;
-
+ 
 // --- Scrum Poker: atividade interativa reutilizável ---
 // O utilizador escolhe uma carta (estimativa) para cada item do backlog;
 // o total é comparado com a capacidade da equipa, para perceber se o
 // conjunto escolhido é realista para a sprint.
-
+ 
 const CARTAS_SCRUM_POKER = [1, 2, 3, 5, 8, 13, 21, "☕"];
-
+ 
 function renderScrumPoker(idPrefix, itens, capacidade) {
   const linhasItens = itens
     .map(
@@ -197,7 +207,7 @@ function renderScrumPoker(idPrefix, itens, capacidade) {
         </li>`
     )
     .join("");
-
+ 
   return `
     <div class="scrum-poker" id="poker-${idPrefix}" data-capacidade="${capacidade}">
       <ul class="poker-itens">${linhasItens}</ul>
@@ -211,22 +221,22 @@ function renderScrumPoker(idPrefix, itens, capacidade) {
       </div>
     </div>`;
 }
-
+ 
 function inicializarScrumPoker(idPrefix) {
   const poker = document.getElementById(`poker-${idPrefix}`);
   if (!poker || poker.dataset.inicializado) return;
   poker.dataset.inicializado = "true";
-
+ 
   const capacidade = Number(poker.dataset.capacidade);
   const valores = {}; // indice do item -> valor numérico escolhido
-
+ 
   const totalValorEl = poker.querySelector(".poker-total-valor");
   const mensagemEl = poker.querySelector(".poker-mensagem");
-
+ 
   function recalcular() {
     const total = Object.values(valores).reduce((soma, v) => soma + v, 0);
     totalValorEl.textContent = total;
-
+ 
     if (Object.keys(valores).length === 0) {
       mensagemEl.textContent = "";
     } else if (total <= capacidade) {
@@ -236,17 +246,17 @@ function inicializarScrumPoker(idPrefix) {
         "⚠️ Ultrapassa a capacidade da equipa — considera deixar algum item para a sprint seguinte.";
     }
   }
-
+ 
   poker.querySelectorAll(".poker-item").forEach((item) => {
     const indice = item.dataset.item;
-
+ 
     item.querySelectorAll(".poker-carta").forEach((carta) => {
       carta.addEventListener("click", () => {
         item
           .querySelectorAll(".poker-carta")
           .forEach((c) => c.classList.remove("selecionada"));
         carta.classList.add("selecionada");
-
+ 
         const valorNumerico = Number(carta.dataset.valor);
         // a carta "☕" (pausa para discutir) não entra na soma
         valores[indice] = Number.isNaN(valorNumerico) ? 0 : valorNumerico;
@@ -254,7 +264,7 @@ function inicializarScrumPoker(idPrefix) {
       });
     });
   });
-
+ 
   poker.querySelector(".poker-repor").addEventListener("click", () => {
     Object.keys(valores).forEach((indice) => delete valores[indice]);
     poker
@@ -263,12 +273,12 @@ function inicializarScrumPoker(idPrefix) {
     recalcular();
   });
 }
-
+ 
 // --- US-08: Sprint Planning ---
-
+ 
 CONTEUDO_ETAPAS["sprint-planning"] = () => `
   <h3>🏃 Sprint Planning</h3>
-
+ 
   <div class="etapa-grelha">
     <div class="etapa-cartao">
       <h4>O que é</h4>
@@ -304,7 +314,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
       </p>
     </div>
   </div>
-
+ 
   <h4>🃏 Scrum Poker: estima o esforço</h4>
   <p>
     Escolhe uma carta para cada item do Product Backlog abaixo. A carta
@@ -312,7 +322,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     na soma. No fim, compara o total com a capacidade da equipa para
     perceberes se o conjunto de itens é realista para a sprint.
   </p>
-
+ 
   ${renderScrumPoker(
     "sprint-planning",
     [
@@ -324,7 +334,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     ],
     20
   )}
-
+ 
   <h4>🎮 Gamificar a Sprint Planning</h4>
   <ul class="lista-gamificacao">
     <li>
@@ -343,7 +353,7 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
       — torna riscos visíveis logo no início da sprint.
     </li>
   </ul>
-
+ 
   ${renderMiniQuiz("sprint-planning", "Sprint Planning", [
     {
       enunciado: "O que é definido durante a Sprint Planning?",
@@ -375,11 +385,821 @@ CONTEUDO_ETAPAS["sprint-planning"] = () => `
     },
   ])}
 `;
+ 
+// --- US-09: Daily Scrum ---
+// Critérios de aceitação cumpridos nesta entrada:
+//  (a) explica 5 pontos, cada um com subtítulo: conceito, objetivo,
+//      participantes, duração (15 minutos) e resultado;
+//  (b) inclui uma infografia (com legenda/título) sobre a Daily Scrum;
+//  (c) inclui um mini-quiz opcional com um máximo de 3 perguntas;
+//  (d) inclui uma secção "Gamificação" própria.
+ 
+CONTEUDO_ETAPAS["daily-scrum"] = () => `
+  <h3>🌀 Daily Scrum</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        A Daily Scrum é um evento diário, com duração fixa (timebox), em que
+        a Equipa de Desenvolvimento inspeciona o progresso em direção ao
+        Sprint Goal e ajusta o Sprint Backlog para o dia seguinte, se
+        necessário.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Sincronizar a equipa: cada elemento partilha o que fez, o que vai
+        fazer e que impedimentos encontra, para identificar obstáculos cedo
+        e ajustar o plano de trabalho do dia.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Equipa de Desenvolvimento conduz o evento; o Scrum Master garante
+        que acontece e se mantém dentro do tempo; o Product Owner pode
+        assistir, mas normalmente não participa ativamente.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        15 minutos, timeboxed — independentemente do tamanho da equipa, o
+        evento não deve ultrapassar este limite.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um plano atualizado para as próximas 24 horas e os impedimentos
+        identificados, que o Scrum Master ou a equipa tratam de resolver
+        fora do evento.
+      </p>
+    </div>
+  </div>
+ 
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">⏱️<br><strong>15 min</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">📋</span>
+        <strong>O que fiz ontem?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🎯</span>
+        <strong>O que vou fazer hoje?</strong>
+        <p>Para ajudar a equipa a progredir em direção ao Sprint Goal.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🚧</span>
+        <strong>Tenho algum impedimento?</strong>
+        <p>Algo que me impeça, a mim ou à equipa, de alcançar o Sprint Goal.</p>
+      </li>
+    </ol>
+    <figcaption>
+      Os três pilares da Daily Scrum — respondidos por cada elemento da
+      equipa, em conjunto, em até 15 minutos.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar a Daily Scrum</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Bastão da palavra:</strong> um objeto (ou emoji, numa versão
+      digital) passa de pessoa a pessoa — só quem o tem pode falar, o que
+      mantém o ritmo e evita interrupções.
+    </li>
+    <li>
+      <strong>Cronómetro visível:</strong> uma barra de progresso dos 15
+      minutos, que muda de cor (verde → amarelo → vermelho) à medida que o
+      tempo passa, para tornar o timebox visível a todos.
+    </li>
+    <li>
+      <strong>Selo "sem impedimentos escondidos":</strong> reconhecer quem
+      reporta impedimentos cedo e com clareza — o incentivo é relatar
+      bloqueios depressa, nunca escondê-los para "parecer bem".
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("daily-scrum", "Daily Scrum", [
+    {
+      enunciado: "Qual é a duração máxima da Daily Scrum?",
+      opcoes: ["15 minutos", "30 minutos", "1 hora"],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem conduz a Daily Scrum?",
+      opcoes: [
+        "O Product Owner",
+        "A Equipa de Desenvolvimento",
+        "Apenas os stakeholders",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é o principal objetivo da Daily Scrum?",
+      opcoes: [
+        "Sincronizar a equipa e identificar impedimentos cedo",
+        "Fazer a revisão do incremento com os stakeholders",
+        "Definir todo o Sprint Backlog a partir do zero",
+      ],
+      correta: 0,
+    },
+  ])}
+`;
+ 
+// --- US-11: Sprint Review ---
+ 
+CONTEUDO_ETAPAS["sprint-review"] = () => `
+  <h3>🔍 Sprint Review</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        Sprint Review é um dos últimos eventos da sprint, 
+        em que a equipa apresenta o Incremento concluído
+        aos stakeholders e todos avaliam o que foi entregue.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Recolher feedback sobre o Incremento e decidir, em conjunto, como
+        adaptar o Product Backlog. Não é uma simples apresentação: é uma
+        sessão de trabalho colaborativa.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Scrum Team (Product Owner, Scrum Master e Equipa de
+        Desenvolvimento) e os stakeholders convidados, que dão feedback
+        sobre o que veem.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        No máximo 4 horas para uma sprint de um mês; nas sprints mais
+        curtas, o evento é proporcionalmente mais curto.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Um Product Backlog revisto e atualizado, com o feedback dos
+        stakeholders incorporado e, se necessário, uma previsão ajustada
+        para as próximas sprints.
+      </p>
+    </div>
+  </div>
+ 
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">🔍<br><strong>Review</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🖥️</span>
+        <strong>Demonstrar o Incremento</strong>
+        <p>A equipa mostra o que ficou concluído (Done) na sprint.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">💬</span>
+        <strong>Recolher feedback</strong>
+        <p>Os stakeholders comentam, questionam e sugerem melhorias.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🔄</span>
+        <strong>Adaptar o Product Backlog</strong>
+        <p>O Product Owner reordena e ajusta os itens com base no que aprendeu.</p>
+      </li>
+    </ol>
+    <figcaption>
+      O ciclo da Sprint Review — mostrar, ouvir e adaptar, para a próxima
+      sprint começar com um backlog mais ajustado à realidade.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar a Sprint Review</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Feira de demonstrações:</strong> cada funcionalidade ganha
+      uma "banca" e os stakeholders circulam, experimentam e atribuem
+      estrelas (1 a 5) — torna a review mais interativa e menos passiva.
+    </li>
+    <li>
+      <strong>Moedas de feedback:</strong> cada stakeholder recebe um
+      número limitado de moedas fictícias para "investir" nas
+      funcionalidades que querem ver evoluir — revela as verdadeiras
+      prioridades para o Product Backlog.
+    </li>
+    <li>
+      <strong>Quadro de conquistas:</strong> as funcionalidades concluídas
+      e o Sprint Goal alcançado são celebrados como "conquistas
+      desbloqueadas", reforçando a motivação da equipa.
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("sprint-review", "Sprint Review", [
+    {
+      enunciado: "Qual é o principal objetivo da Sprint Review?",
+      opcoes: [
+        "Inspecionar o Incremento e recolher feedback para adaptar o Product Backlog",
+        "Avaliar o desempenho individual de cada elemento da equipa",
+        "Planear em detalhe a sprint seguinte",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado: "Quem participa na Sprint Review?",
+      opcoes: [
+        "Apenas a Equipa de Desenvolvimento",
+        "A Scrum Team e os stakeholders convidados",
+        "Só o Scrum Master e o Product Owner",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Qual é um resultado típico da Sprint Review?",
+      opcoes: [
+        "A lista de melhorias de processo para a próxima sprint",
+        "O Sprint Backlog da sprint seguinte",
+        "Um Product Backlog atualizado com base no feedback recebido",
+      ],
+      correta: 2,
+    },
+  ])}
+`;
+ 
+// --- Pop-ups "saber mais": termos destacados que abrem uma caixa com a definição ---
+// Uso: renderTermo("chave", "texto visível") dentro do HTML de uma etapa.
+// A definição de cada termo vive em TERMOS_POPUP.
+ 
+const TERMOS_POPUP = {
+  "sprint-backlog": {
+    titulo: "Sprint Backlog",
+    texto:
+      "É a lista de itens do Product Backlog escolhidos para a sprint, mais o plano da equipa para os entregar. Pertence à Equipa de Desenvolvimento e vai sendo atualizado durante a sprint.",
+  },
+  "daily-scrum": {
+    titulo: "Daily Scrum",
+    texto:
+      "Reunião diária de 15 minutos em que a Equipa de Desenvolvimento verifica o progresso rumo ao Sprint Goal e ajusta o plano para as próximas 24 horas.",
+  },
+  incremento: {
+    titulo: "Incremento",
+    texto:
+      "É um passo concreto rumo ao Sprint Goal. Cada incremento soma-se a todos os anteriores e tem de estar utilizável, mesmo que o Product Owner decida não o lançar logo.",
+  },
+  "definition-of-done": {
+    titulo: "Definition of Done",
+    texto:
+      "Descrição formal, acordada pela equipa, do que tem de ser verdade para um item se poder considerar concluído. Se um item não cumpre a Definition of Done, não é um incremento e volta ao Product Backlog.",
+  },
+};
+ 
+function renderTermo(chave, texto) {
+  return `<button type="button" class="termo" data-termo="${chave}">${texto}</button>`;
+}
+ 
+function inicializarPopups() {
+  if (document.body.dataset.popupsInicializados) return;
+  document.body.dataset.popupsInicializados = "true";
+ 
+  const dialogo = document.createElement("dialog");
+  dialogo.className = "popup-termo";
+  dialogo.setAttribute("aria-labelledby", "popup-termo-titulo");
+  dialogo.innerHTML = `
+    <h4 id="popup-termo-titulo"></h4>
+    <p class="popup-termo-texto"></p>
+    <button type="button" class="popup-termo-fechar">Fechar</button>`;
+  document.body.appendChild(dialogo);
+ 
+  const tituloEl = dialogo.querySelector("#popup-termo-titulo");
+  const textoEl = dialogo.querySelector(".popup-termo-texto");
+ 
+  dialogo
+    .querySelector(".popup-termo-fechar")
+    .addEventListener("click", () => dialogo.close());
+  // clicar fora da caixa também fecha
+  dialogo.addEventListener("click", (evento) => {
+    if (evento.target === dialogo) dialogo.close();
+  });
+ 
+  document.addEventListener("click", (evento) => {
+    const botao = evento.target.closest(".termo");
+    if (!botao) return;
+    const termo = TERMOS_POPUP[botao.dataset.termo];
+    if (!termo) return;
+    tituloEl.textContent = termo.titulo;
+    textoEl.textContent = termo.texto;
+    dialogo.showModal();
+  });
+}
+ 
+// --- US-10: Development ---
+ 
+CONTEUDO_ETAPAS["development"] = () => `
+  <h3>💻 Development</h3>
+ 
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Desenvolvimento durante a Sprint</h4>
+      <p>
+        Depois da Sprint Planning, a equipa trabalha nos itens do
+        ${renderTermo("sprint-backlog", "Sprint Backlog")} até ao fim da
+        sprint. Não há um "chefe" que distribui tarefas: a equipa
+        organiza-se sozinha e sincroniza-se na
+        ${renderTermo("daily-scrum", "Daily Scrum")}.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Incremento</h4>
+      <p>
+        O ${renderTermo("incremento", "Incremento")} é o resultado utilizável
+        da sprint: a soma de todos os itens concluídos, juntamente com os
+        incrementos das sprints anteriores. Funciona, está integrado e
+        pode ser mostrado ao cliente.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Definition of Done</h4>
+      <p>
+        A ${renderTermo("definition-of-done", "Definition of Done")} é a
+        lista que a equipa acorda para saber quando um item está mesmo
+        pronto. Um item só conta para o Incremento se cumprir todos os
+        pontos dessa lista.
+      </p>
+    </div>
+  </div>
+ 
+  <h4>📊 Infografia: da tarefa ao Incremento</h4>
+  <figure class="infografia-dod">
+    <div class="dod-fluxo">
+      <div class="dod-passo">
+        <span class="dod-passo-icone" aria-hidden="true">📝</span>
+        <strong>Item do Sprint Backlog</strong>
+        <span>Ex.: "Criar o footer da página"</span>
+      </div>
+      <span class="dod-seta" aria-hidden="true">➜</span>
+      <div class="dod-passo dod-passo-checklist">
+        <span class="dod-passo-icone" aria-hidden="true">✅</span>
+        <strong>Definition of Done</strong>
+        <ul class="dod-lista">
+          <li>Código revisto por outro membro</li>
+          <li>Testado no browser (telemóvel e computador)</li>
+          <li>Integrado no ramo <code>dev</code></li>
+          <li>Publicado no Netlify</li>
+          <li>Critérios de aceitação cumpridos</li>
+        </ul>
+      </div>
+      <span class="dod-seta" aria-hidden="true">➜</span>
+      <div class="dod-passo dod-passo-resultado">
+        <span class="dod-passo-icone" aria-hidden="true">🎁</span>
+        <strong>Incremento</strong>
+        <span>Parte do produto, pronta a mostrar na Sprint Review</span>
+      </div>
+    </div>
+    <figcaption>
+      Um item só entra no Incremento depois de cumprir todos os pontos da
+      Definition of Done. Se falhar um só ponto, volta ao Product Backlog.
+    </figcaption>
+  </figure>
+ 
+  <h4>🎮 Gamificar o desenvolvimento</h4>
+  <ul class="lista-gamificacao">
+    <li>
+      <strong>Checklist de selos:</strong> cada ponto da Definition of Done
+      dá um selo; um item só fica "dourado" quando reúne todos os selos —
+      torna o conceito de "concluído" visível e partilhado.
+    </li>
+    <li>
+      <strong>Quadro de missões:</strong> apresentar o Sprint Backlog como
+      um quadro de missões (a fazer, em curso, concluída), onde a equipa
+      avança as cartas em conjunto.
+    </li>
+    <li>
+      <strong>Barra de progresso do Sprint Goal:</strong> uma barra que
+      enche à medida que os itens passam a "Done", para a equipa ver
+      quanto falta, sem competição entre pessoas.
+    </li>
+  </ul>
+ 
+  ${renderMiniQuiz("development", "Development", [
+    {
+      enunciado: "O que é o Incremento?",
+      opcoes: [
+        "A lista de tarefas ainda por fazer na sprint",
+        "O resultado utilizável da sprint, que soma os itens concluídos",
+        "O relatório que o Scrum Master entrega no fim da sprint",
+      ],
+      correta: 1,
+    },
+    {
+      enunciado: "Quando é que um item pode ser considerado concluído?",
+      opcoes: [
+        "Quando o developer acha que acabou o seu código",
+        "Quando o Product Owner tem pressa de o ter",
+        "Quando cumpre todos os pontos da Definition of Done",
+      ],
+      correta: 2,
+    },
+    {
+      enunciado: "O que acontece a um item que não cumpre a Definition of Done?",
+      opcoes: [
+        "Volta ao Product Backlog e não entra no Incremento",
+        "Entra no Incremento com um aviso",
+        "É apagado do projeto",
+      ],
+      correta: 0,
+    },
+  ])}
+`;
 
+
+function renderVotacaoPontos(idPrefix, temas, pontos) {
+  const linhas = temas
+    .map(
+      (tema, indice) => `
+        <li class="votacao-item" data-tema="${indice}">
+          <span class="votacao-nome">${tema}</span>
+          <div class="votacao-controlos">
+            <button type="button" class="votacao-menos" aria-label="Retirar um ponto">−</button>
+            <span class="votacao-valor" aria-live="polite">0</span>
+            <button type="button" class="votacao-mais" aria-label="Dar um ponto">+</button>
+          </div>
+        </li>`
+    )
+    .join("");
+
+  return `
+    <div class="votacao-pontos" id="votacao-${idPrefix}" data-pontos="${pontos}">
+      <div class="votacao-cabecalho">
+        <p class="votacao-votante-linha">
+          A votar: <strong class="votacao-votante">Pessoa 1</strong>
+        </p>
+        <p class="votacao-restantes">
+          Pontos por distribuir: <strong><span class="votacao-restantes-valor">${pontos}</span></strong>
+        </p>
+      </div>
+      <ul class="votacao-itens">${linhas}</ul>
+      <p class="votacao-mensagem" aria-live="polite"></p>
+      <div class="votacao-acoes" hidden>
+        <button type="button" class="votacao-passar">👥 Passar a Pessoa 2</button>
+        <button type="button" class="votacao-simular">🎲 Simular o voto de um colega</button>
+      </div>
+      <div class="votacao-resultados" hidden></div>
+      <button type="button" class="votacao-repor">Recomeçar</button>
+    </div>`;
+}
+
+function inicializarVotacaoPontos(idPrefix) {
+  const votacao = document.getElementById(`votacao-${idPrefix}`);
+  if (!votacao || votacao.dataset.inicializado) return;
+  votacao.dataset.inicializado = "true";
+
+  const pontosTotais = Number(votacao.dataset.pontos);
+  const itens = Array.from(votacao.querySelectorAll(".votacao-item"));
+  const nomesTemas = itens.map(
+    (item) => item.querySelector(".votacao-nome").textContent
+  );
+
+  const cabecalhoEl = votacao.querySelector(".votacao-cabecalho");
+  const listaEl = votacao.querySelector(".votacao-itens");
+  const votanteEl = votacao.querySelector(".votacao-votante");
+  const restantesEl = votacao.querySelector(".votacao-restantes-valor");
+  const mensagemEl = votacao.querySelector(".votacao-mensagem");
+  const acoesEl = votacao.querySelector(".votacao-acoes");
+  const resultadosEl = votacao.querySelector(".votacao-resultados");
+
+  let votos = itens.map(() => 0); // votos da pessoa que está a votar
+  let fase = 0; // 0 = Pessoa 1, 1 = Pessoa 2, 2 = resultados
+  const guardados = []; // votos fechados de cada pessoa
+  const nomesVotantes = ["Pessoa 1", "Pessoa 2"];
+
+  function vencedoresDe(totais) {
+    const maximo = Math.max(...totais);
+    return nomesTemas.filter((_, i) => totais[i] === maximo);
+  }
+
+  // distribui os pontos ao acaso pelos temas (voto simulado)
+  function votoAleatorio() {
+    const simulado = itens.map(() => 0);
+    for (let p = 0; p < pontosTotais; p++) {
+      simulado[Math.floor(Math.random() * itens.length)] += 1;
+    }
+    return simulado;
+  }
+
+  function mostrarResultados() {
+    fase = 2;
+    const totais = nomesTemas.map((_, i) => guardados[0][i] + guardados[1][i]);
+    const maximoPossivel = pontosTotais * 2;
+    const ordem = totais
+      .map((total, i) => ({ total, i }))
+      .sort((a, b) => b.total - a.total);
+
+    const linhas = ordem
+      .map(
+        ({ total, i }) => `
+          <li class="resultado-linha${total === Math.max(...totais) ? " resultado-topo" : ""}">
+            <div class="resultado-texto">
+              <span class="resultado-nome">${nomesTemas[i]}</span>
+              <span class="resultado-detalhe">
+                ${nomesVotantes[0]}: ${guardados[0][i]} · ${nomesVotantes[1]}: ${guardados[1][i]}
+                &nbsp;→&nbsp; <strong>${total}</strong>
+              </span>
+            </div>
+            <div class="resultado-barra">
+              <div class="resultado-barra-cheia" style="width: ${(total / maximoPossivel) * 100}%"></div>
+            </div>
+          </li>`
+      )
+      .join("");
+
+    const vencedores = vencedoresDe(totais);
+    const conclusao =
+      vencedores.length === 1
+        ? `🏆 Melhoria prioritária da equipa: ${vencedores[0]}`
+        : `🤝 Empate entre: ${vencedores.join(", ")} — discutam e escolham em equipa.`;
+
+    resultadosEl.innerHTML = `
+      <h5>Resultado da equipa</h5>
+      <ul class="resultado-lista">${linhas}</ul>
+      <p class="resultado-conclusao">${conclusao}</p>`;
+
+    cabecalhoEl.hidden = true;
+    listaEl.hidden = true;
+    mensagemEl.textContent = "";
+    acoesEl.hidden = true;
+    resultadosEl.hidden = false;
+  }
+
+  function atualizar() {
+    const usados = votos.reduce((soma, v) => soma + v, 0);
+    const restantes = pontosTotais - usados;
+    restantesEl.textContent = restantes;
+    votanteEl.textContent = nomesVotantes[Math.min(fase, 1)];
+
+    itens.forEach((item, i) => {
+      item.querySelector(".votacao-valor").textContent = votos[i];
+      item.querySelector(".votacao-mais").disabled = restantes === 0;
+      item.querySelector(".votacao-menos").disabled = votos[i] === 0;
+      item.classList.toggle("com-votos", votos[i] > 0);
+    });
+
+    if (restantes > 0) {
+      mensagemEl.textContent = "";
+      acoesEl.hidden = true;
+      return;
+    }
+
+    if (fase === 0) {
+      mensagemEl.textContent =
+        "✅ Pessoa 1 já votou. Passa o ecrã a um colega ou simula o voto dele.";
+      acoesEl.hidden = false;
+    } else if (fase === 1) {
+      guardados[1] = [...votos];
+      mostrarResultados();
+    }
+  }
+
+  itens.forEach((item, i) => {
+    item.querySelector(".votacao-mais").addEventListener("click", () => {
+      votos[i] += 1;
+      atualizar();
+    });
+    item.querySelector(".votacao-menos").addEventListener("click", () => {
+      votos[i] -= 1;
+      atualizar();
+    });
+  });
+
+  // Opção 1: uma segunda pessoa vota no mesmo ecrã
+  votacao.querySelector(".votacao-passar").addEventListener("click", () => {
+    guardados[0] = [...votos];
+    votos = itens.map(() => 0);
+    fase = 1;
+    acoesEl.hidden = true;
+    mensagemEl.textContent = "";
+    atualizar();
+  });
+
+  // Opção 2: o voto da segunda pessoa é simulado
+  votacao.querySelector(".votacao-simular").addEventListener("click", () => {
+    guardados[0] = [...votos];
+    guardados[1] = votoAleatorio();
+    nomesVotantes[1] = "Colega (simulado)";
+    mostrarResultados();
+  });
+
+  votacao.querySelector(".votacao-repor").addEventListener("click", () => {
+    votos = itens.map(() => 0);
+    guardados.length = 0;
+    nomesVotantes[1] = "Pessoa 2";
+    fase = 0;
+    cabecalhoEl.hidden = false;
+    listaEl.hidden = false;
+    resultadosEl.hidden = true;
+    atualizar();
+  });
+
+  atualizar();
+}
+
+// --- US-12: Sprint Retrospective ---
+
+CONTEUDO_ETAPAS["sprint-retrospective"] = () => `
+  <h3>🔁 Sprint Retrospective</h3>
+
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        A Sprint Retrospective é o evento que fecha a sprint, depois da
+        Sprint Review. A Scrum Team olha para trás e inspeciona a forma
+        como trabalhou: as pessoas, as interações, os processos, as
+        ferramentas e a Definition of Done.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Perceber o que correu bem, o que pode melhorar e decidir ações
+        concretas para aumentar a qualidade e a eficácia da equipa na
+        próxima sprint. O foco é o processo, nunca apontar culpados.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Scrum Team completa: Product Owner, Scrum Master e Equipa de
+        Desenvolvimento. É um espaço seguro e interno, por isso os
+        stakeholders não costumam estar presentes.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        No máximo 3 horas para uma sprint de um mês; nas sprints mais
+        curtas, o evento é proporcionalmente mais curto.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Uma ou mais melhorias concretas para a equipa aplicar já na sprint
+        seguinte, muitas vezes adicionadas ao Sprint Backlog para não
+        ficarem esquecidas.
+      </p>
+    </div>
+  </div>
+
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">🔁<br><strong>Retro</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">👍</span>
+        <strong>O que correu bem?</strong>
+        <p>Identificar o que vale a pena manter e repetir.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🔧</span>
+        <strong>O que pode melhorar?</strong>
+        <p>Perceber os problemas e as suas causas, sem apontar culpados.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🎯</span>
+        <strong>Que ações vamos tomar?</strong>
+        <p>Escolher melhorias concretas e decidir quem as acompanha.</p>
+      </li>
+    </ol>
+    <figcaption>
+      O ciclo da Sprint Retrospective — olhar para trás, aprender e
+      combinar o que muda na sprint seguinte.
+    </figcaption>
+  </figure>
+
+  <section class="gamificacao-destaque">
+    <h4>🎮 Gamificar a Sprint Retrospective</h4>
+    <p class="gamificacao-intro">
+      A retrospetiva é o evento que mais facilmente cai na rotina: repetem-se
+      as mesmas perguntas e as mesmas respostas. É aqui que a gamificação
+      mais ajuda, porque torna a conversa mais leve, dá a todos a mesma voz
+      e transforma a reflexão em ações concretas.
+    </p>
+
+    <div class="etapa-grelha">
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>⛵ Retro temática: o barco à vela</h4>
+        <p>
+          Desenha um barco com quatro zonas: o <strong>vento</strong> (o que
+          nos impulsiona), as <strong>âncoras</strong> (o que nos trava), os
+          <strong>rochedos</strong> (riscos à frente) e a <strong>ilha</strong>
+          (o objetivo da próxima sprint). Cada pessoa cola notas nas zonas.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> a metáfora torna mais fácil falar
+          de problemas sem apontar o dedo a ninguém.
+        </p>
+      </div>
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>🗳️ Votação por pontos</h4>
+        <p>
+          Depois de reunidos os temas, cada pessoa recebe 3 pontos para
+          distribuir como quiser. Os temas com mais pontos passam a ser as
+          melhorias prioritárias da equipa.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> todos votam ao mesmo tempo e com o
+          mesmo peso, por isso as vozes mais fortes não ofuscam as outras.
+        </p>
+      </div>
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>💌 Cartas de reconhecimento</h4>
+        <p>
+          Cada elemento escreve uma carta curta a agradecer a um colega pela
+          ajuda que recebeu durante a sprint e lê-a em voz alta no final do
+          evento.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> reforça a colaboração e termina a
+          retrospetiva com uma nota positiva.
+        </p>
+      </div>
+    </div>
+
+    <h4>🧪 Experimenta: votação por pontos</h4>
+    <p>
+      Imagina que a tua equipa levantou estes temas na retrospetiva. Tens
+      3 pontos: distribui-os pelos temas que achas mais importantes
+      melhorar. Depois, uma segunda pessoa pode votar no mesmo ecrã ou
+      podes simular o voto de um colega — no fim vês o total da equipa e
+      qual sai como prioridade.
+    </p>
+
+    ${renderVotacaoPontos(
+      "sprint-retrospective",
+      [
+        "Reuniões demasiado longas",
+        "Falta de clareza nos requisitos",
+        "Comunicação dentro da equipa",
+        "Testes feitos à pressa",
+        "Ferramentas pouco práticas",
+      ],
+      3
+    )}
+
+    <p class="gamificacao-aviso">
+      ⚠️ <strong>Atenção:</strong> a gamificação deve recompensar a
+      colaboração e a melhoria da equipa, nunca criar rankings ou
+      competição entre pessoas. Numa retrospetiva, o "prémio" é a equipa
+      funcionar melhor.
+    </p>
+  </section>
+
+  ${renderMiniQuiz("sprint-retrospective", "Sprint Retrospective", [
+    {
+      enunciado: "Qual é o principal objetivo da Sprint Retrospective?",
+      opcoes: [
+        "Mostrar o Incremento aos stakeholders",
+        "Definir o Sprint Goal da sprint seguinte",
+        "Identificar melhorias na forma de trabalhar da equipa",
+      ],
+      correta: 2,
+    },
+    {
+      enunciado: "Quem participa na Sprint Retrospective?",
+      opcoes: [
+        "A Scrum Team: Product Owner, Scrum Master e Equipa de Desenvolvimento",
+        "Apenas o Scrum Master",
+        "A Scrum Team e todos os stakeholders externos",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado: "Qual é um resultado típico da Sprint Retrospective?",
+      opcoes: [
+        "Um novo roadmap da release",
+        "Ações de melhoria concretas para a sprint seguinte",
+        "A avaliação do desempenho individual de cada elemento",
+      ],
+      correta: 1,
+    },
+  ])}
+`;
+
+ 
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
 // mini-quizzes e atividades interativas das etapas que já têm conteúdo
 // próprio.
 function inicializarConteudoEtapas() {
   Object.keys(CONTEUDO_ETAPAS).forEach((id) => inicializarMiniQuiz(id));
   inicializarScrumPoker("sprint-planning");
+  inicializarPopups();
+  inicializarVotacaoPontos("sprint-retrospective");
 }
+ 

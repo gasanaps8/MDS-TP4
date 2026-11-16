@@ -1,11 +1,7 @@
-// As seis etapas do Scrum, pela ordem definida na US-05.
-// "estado" é um de: "concluida" | "atual" | "futura" — reflete o progresso
-// da equipa, independente de qual tab está aberta no momento (US-06).
-// NOTA: ajusta os estados conforme o progresso real da equipa fica à medida
-// que as tabs (US-07 a US-12) forem sendo construídas.
+
 const ETAPAS = [
-  { id: "release-planning", nome: "Release Planning", estado: "concluida" },
-  { id: "sprint-planning", nome: "Sprint Planning", estado: "atual" },
+  { id: "release-planning", nome: "Release Planning", estado: "atual" },
+  { id: "sprint-planning", nome: "Sprint Planning", estado: "futura" },
   { id: "daily-scrum", nome: "Daily Scrum", estado: "futura" },
   { id: "development", nome: "Development", estado: "futura" },
   { id: "sprint-review", nome: "Sprint Review", estado: "futura" },
@@ -48,7 +44,52 @@ function renderMapaEtapas() {
   mapa.querySelectorAll(".etapa-btn").forEach((botao) => {
     botao.addEventListener("click", () => selecionarEtapa(botao.dataset.etapa));
   });
+
+  // Desenha as linhas tracejadas em onda depois de o DOM atualizar
+  requestAnimationFrame(desenharCaminhoOndas);
 }
+
+// Desenha curvas Bezier tracejadas a ligar o centro de cada círculo ao seguinte
+function desenharCaminhoOndas() {
+  const svg = document.getElementById("mapa-caminho");
+  const wrapper = document.querySelector(".mapa-wrapper");
+  if (!svg || !wrapper) return;
+
+  const circulos = wrapper.querySelectorAll(".etapa-numero");
+  if (circulos.length < 2) return;
+
+  const rectWrapper = wrapper.getBoundingClientRect();
+  svg.setAttribute("viewBox", `0 0 ${rectWrapper.width} ${rectWrapper.height}`);
+
+  // Calcula o centro (x, y) de cada círculo relativo ao wrapper
+  const pontos = Array.from(circulos).map((el) => {
+    const r = el.getBoundingClientRect();
+    return {
+      x: r.left - rectWrapper.left + r.width / 2,
+      y: r.top - rectWrapper.top + r.height / 2,
+    };
+  });
+
+  let pathsHTML = "";
+
+  for (let i = 0; i < pontos.length - 1; i++) {
+    const p1 = pontos[i];
+    const p2 = pontos[i + 1];
+
+    // Pontos de controlo horizontais para criar uma onda suave (S-curve)
+    const meioX = (p1.x + p2.x) / 2;
+    const d = `M ${p1.x} ${p1.y} C ${meioX} ${p1.y}, ${meioX} ${p2.y}, ${p2.x} ${p2.y}`;
+
+    // Se a etapa atual já foi ultrapassada, pinta o traço de cor ativa
+    const concluido = i < indiceAtivo;
+    pathsHTML += `<path d="${d}" class="caminho-segmento ${concluido ? "concluido" : ""}" />`;
+  }
+
+  svg.innerHTML = pathsHTML;
+}
+
+// Recalcula as curvas caso o ecrã seja redimensionado
+window.addEventListener("resize", desenharCaminhoOndas);
 
 // US-06: um painel de conteúdo por etapa; só o painel ativo fica visível.
 // O conteúdo real de cada etapa vive em CONTEUDO_ETAPAS (conteudo-etapas.js,
@@ -97,16 +138,38 @@ function atualizarEstadoAtivo() {
   });
 }
 
+
 function selecionarEtapa(id) {
   const indice = ETAPAS.findIndex((etapa) => etapa.id === id);
   if (indice === -1) return;
 
+  // Atualiza o estado de todas as etapas
+  ETAPAS.forEach((etapa, i) => {
+    if (i < indice) {
+      etapa.estado = "concluida";
+    } else if (i === indice) {
+      etapa.estado = "atual";
+    } else {
+      etapa.estado = "futura";
+    }
+  });
+
+  // Atualiza o índice da etapa ativa
   indiceAtivo = indice;
+
+  // Atualiza o mapa e os painéis
+  renderMapaEtapas();
   atualizarEstadoAtivo();
 
   const contentor = document.getElementById("painel-etapas");
-  if (contentor) contentor.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (contentor) {
+    contentor.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
 }
+
 
 function etapaSeguinte(delta) {
   const total = ETAPAS.length;
