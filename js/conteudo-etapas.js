@@ -818,6 +818,380 @@ CONTEUDO_ETAPAS["development"] = () => `
     },
   ])}
 `;
+
+
+function renderVotacaoPontos(idPrefix, temas, pontos) {
+  const linhas = temas
+    .map(
+      (tema, indice) => `
+        <li class="votacao-item" data-tema="${indice}">
+          <span class="votacao-nome">${tema}</span>
+          <div class="votacao-controlos">
+            <button type="button" class="votacao-menos" aria-label="Retirar um ponto">−</button>
+            <span class="votacao-valor" aria-live="polite">0</span>
+            <button type="button" class="votacao-mais" aria-label="Dar um ponto">+</button>
+          </div>
+        </li>`
+    )
+    .join("");
+
+  return `
+    <div class="votacao-pontos" id="votacao-${idPrefix}" data-pontos="${pontos}">
+      <div class="votacao-cabecalho">
+        <p class="votacao-votante-linha">
+          A votar: <strong class="votacao-votante">Pessoa 1</strong>
+        </p>
+        <p class="votacao-restantes">
+          Pontos por distribuir: <strong><span class="votacao-restantes-valor">${pontos}</span></strong>
+        </p>
+      </div>
+      <ul class="votacao-itens">${linhas}</ul>
+      <p class="votacao-mensagem" aria-live="polite"></p>
+      <div class="votacao-acoes" hidden>
+        <button type="button" class="votacao-passar">👥 Passar a Pessoa 2</button>
+        <button type="button" class="votacao-simular">🎲 Simular o voto de um colega</button>
+      </div>
+      <div class="votacao-resultados" hidden></div>
+      <button type="button" class="votacao-repor">Recomeçar</button>
+    </div>`;
+}
+
+function inicializarVotacaoPontos(idPrefix) {
+  const votacao = document.getElementById(`votacao-${idPrefix}`);
+  if (!votacao || votacao.dataset.inicializado) return;
+  votacao.dataset.inicializado = "true";
+
+  const pontosTotais = Number(votacao.dataset.pontos);
+  const itens = Array.from(votacao.querySelectorAll(".votacao-item"));
+  const nomesTemas = itens.map(
+    (item) => item.querySelector(".votacao-nome").textContent
+  );
+
+  const cabecalhoEl = votacao.querySelector(".votacao-cabecalho");
+  const listaEl = votacao.querySelector(".votacao-itens");
+  const votanteEl = votacao.querySelector(".votacao-votante");
+  const restantesEl = votacao.querySelector(".votacao-restantes-valor");
+  const mensagemEl = votacao.querySelector(".votacao-mensagem");
+  const acoesEl = votacao.querySelector(".votacao-acoes");
+  const resultadosEl = votacao.querySelector(".votacao-resultados");
+
+  let votos = itens.map(() => 0); // votos da pessoa que está a votar
+  let fase = 0; // 0 = Pessoa 1, 1 = Pessoa 2, 2 = resultados
+  const guardados = []; // votos fechados de cada pessoa
+  const nomesVotantes = ["Pessoa 1", "Pessoa 2"];
+
+  function vencedoresDe(totais) {
+    const maximo = Math.max(...totais);
+    return nomesTemas.filter((_, i) => totais[i] === maximo);
+  }
+
+  // distribui os pontos ao acaso pelos temas (voto simulado)
+  function votoAleatorio() {
+    const simulado = itens.map(() => 0);
+    for (let p = 0; p < pontosTotais; p++) {
+      simulado[Math.floor(Math.random() * itens.length)] += 1;
+    }
+    return simulado;
+  }
+
+  function mostrarResultados() {
+    fase = 2;
+    const totais = nomesTemas.map((_, i) => guardados[0][i] + guardados[1][i]);
+    const maximoPossivel = pontosTotais * 2;
+    const ordem = totais
+      .map((total, i) => ({ total, i }))
+      .sort((a, b) => b.total - a.total);
+
+    const linhas = ordem
+      .map(
+        ({ total, i }) => `
+          <li class="resultado-linha${total === Math.max(...totais) ? " resultado-topo" : ""}">
+            <div class="resultado-texto">
+              <span class="resultado-nome">${nomesTemas[i]}</span>
+              <span class="resultado-detalhe">
+                ${nomesVotantes[0]}: ${guardados[0][i]} · ${nomesVotantes[1]}: ${guardados[1][i]}
+                &nbsp;→&nbsp; <strong>${total}</strong>
+              </span>
+            </div>
+            <div class="resultado-barra">
+              <div class="resultado-barra-cheia" style="width: ${(total / maximoPossivel) * 100}%"></div>
+            </div>
+          </li>`
+      )
+      .join("");
+
+    const vencedores = vencedoresDe(totais);
+    const conclusao =
+      vencedores.length === 1
+        ? `🏆 Melhoria prioritária da equipa: ${vencedores[0]}`
+        : `🤝 Empate entre: ${vencedores.join(", ")} — discutam e escolham em equipa.`;
+
+    resultadosEl.innerHTML = `
+      <h5>Resultado da equipa</h5>
+      <ul class="resultado-lista">${linhas}</ul>
+      <p class="resultado-conclusao">${conclusao}</p>`;
+
+    cabecalhoEl.hidden = true;
+    listaEl.hidden = true;
+    mensagemEl.textContent = "";
+    acoesEl.hidden = true;
+    resultadosEl.hidden = false;
+  }
+
+  function atualizar() {
+    const usados = votos.reduce((soma, v) => soma + v, 0);
+    const restantes = pontosTotais - usados;
+    restantesEl.textContent = restantes;
+    votanteEl.textContent = nomesVotantes[Math.min(fase, 1)];
+
+    itens.forEach((item, i) => {
+      item.querySelector(".votacao-valor").textContent = votos[i];
+      item.querySelector(".votacao-mais").disabled = restantes === 0;
+      item.querySelector(".votacao-menos").disabled = votos[i] === 0;
+      item.classList.toggle("com-votos", votos[i] > 0);
+    });
+
+    if (restantes > 0) {
+      mensagemEl.textContent = "";
+      acoesEl.hidden = true;
+      return;
+    }
+
+    if (fase === 0) {
+      mensagemEl.textContent =
+        "✅ Pessoa 1 já votou. Passa o ecrã a um colega ou simula o voto dele.";
+      acoesEl.hidden = false;
+    } else if (fase === 1) {
+      guardados[1] = [...votos];
+      mostrarResultados();
+    }
+  }
+
+  itens.forEach((item, i) => {
+    item.querySelector(".votacao-mais").addEventListener("click", () => {
+      votos[i] += 1;
+      atualizar();
+    });
+    item.querySelector(".votacao-menos").addEventListener("click", () => {
+      votos[i] -= 1;
+      atualizar();
+    });
+  });
+
+  // Opção 1: uma segunda pessoa vota no mesmo ecrã
+  votacao.querySelector(".votacao-passar").addEventListener("click", () => {
+    guardados[0] = [...votos];
+    votos = itens.map(() => 0);
+    fase = 1;
+    acoesEl.hidden = true;
+    mensagemEl.textContent = "";
+    atualizar();
+  });
+
+  // Opção 2: o voto da segunda pessoa é simulado
+  votacao.querySelector(".votacao-simular").addEventListener("click", () => {
+    guardados[0] = [...votos];
+    guardados[1] = votoAleatorio();
+    nomesVotantes[1] = "Colega (simulado)";
+    mostrarResultados();
+  });
+
+  votacao.querySelector(".votacao-repor").addEventListener("click", () => {
+    votos = itens.map(() => 0);
+    guardados.length = 0;
+    nomesVotantes[1] = "Pessoa 2";
+    fase = 0;
+    cabecalhoEl.hidden = false;
+    listaEl.hidden = false;
+    resultadosEl.hidden = true;
+    atualizar();
+  });
+
+  atualizar();
+}
+
+// --- US-12: Sprint Retrospective ---
+
+CONTEUDO_ETAPAS["sprint-retrospective"] = () => `
+  <h3>🔁 Sprint Retrospective</h3>
+
+  <div class="etapa-grelha">
+    <div class="etapa-cartao">
+      <h4>Conceito</h4>
+      <p>
+        A Sprint Retrospective é o evento que fecha a sprint, depois da
+        Sprint Review. A Scrum Team olha para trás e inspeciona a forma
+        como trabalhou: as pessoas, as interações, os processos, as
+        ferramentas e a Definition of Done.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Objetivo</h4>
+      <p>
+        Perceber o que correu bem, o que pode melhorar e decidir ações
+        concretas para aumentar a qualidade e a eficácia da equipa na
+        próxima sprint. O foco é o processo, nunca apontar culpados.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Participantes</h4>
+      <p>
+        A Scrum Team completa: Product Owner, Scrum Master e Equipa de
+        Desenvolvimento. É um espaço seguro e interno, por isso os
+        stakeholders não costumam estar presentes.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Duração</h4>
+      <p>
+        No máximo 3 horas para uma sprint de um mês; nas sprints mais
+        curtas, o evento é proporcionalmente mais curto.
+      </p>
+    </div>
+    <div class="etapa-cartao">
+      <h4>Resultado</h4>
+      <p>
+        Uma ou mais melhorias concretas para a equipa aplicar já na sprint
+        seguinte, muitas vezes adicionadas ao Sprint Backlog para não
+        ficarem esquecidas.
+      </p>
+    </div>
+  </div>
+
+  <figure class="etapa-infografia">
+    <div class="infografia-relogio" aria-hidden="true">🔁<br><strong>Retro</strong></div>
+    <ol class="infografia-passos">
+      <li>
+        <span class="infografia-icone" aria-hidden="true">👍</span>
+        <strong>O que correu bem?</strong>
+        <p>Identificar o que vale a pena manter e repetir.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🔧</span>
+        <strong>O que pode melhorar?</strong>
+        <p>Perceber os problemas e as suas causas, sem apontar culpados.</p>
+      </li>
+      <li>
+        <span class="infografia-icone" aria-hidden="true">🎯</span>
+        <strong>Que ações vamos tomar?</strong>
+        <p>Escolher melhorias concretas e decidir quem as acompanha.</p>
+      </li>
+    </ol>
+    <figcaption>
+      O ciclo da Sprint Retrospective — olhar para trás, aprender e
+      combinar o que muda na sprint seguinte.
+    </figcaption>
+  </figure>
+
+  <section class="gamificacao-destaque">
+    <h4>🎮 Gamificar a Sprint Retrospective</h4>
+    <p class="gamificacao-intro">
+      A retrospetiva é o evento que mais facilmente cai na rotina: repetem-se
+      as mesmas perguntas e as mesmas respostas. É aqui que a gamificação
+      mais ajuda, porque torna a conversa mais leve, dá a todos a mesma voz
+      e transforma a reflexão em ações concretas.
+    </p>
+
+    <div class="etapa-grelha">
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>⛵ Retro temática: o barco à vela</h4>
+        <p>
+          Desenha um barco com quatro zonas: o <strong>vento</strong> (o que
+          nos impulsiona), as <strong>âncoras</strong> (o que nos trava), os
+          <strong>rochedos</strong> (riscos à frente) e a <strong>ilha</strong>
+          (o objetivo da próxima sprint). Cada pessoa cola notas nas zonas.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> a metáfora torna mais fácil falar
+          de problemas sem apontar o dedo a ninguém.
+        </p>
+      </div>
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>🗳️ Votação por pontos</h4>
+        <p>
+          Depois de reunidos os temas, cada pessoa recebe 3 pontos para
+          distribuir como quiser. Os temas com mais pontos passam a ser as
+          melhorias prioritárias da equipa.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> todos votam ao mesmo tempo e com o
+          mesmo peso, por isso as vozes mais fortes não ofuscam as outras.
+        </p>
+      </div>
+      <div class="etapa-cartao gamificacao-cartao">
+        <h4>💌 Cartas de reconhecimento</h4>
+        <p>
+          Cada elemento escreve uma carta curta a agradecer a um colega pela
+          ajuda que recebeu durante a sprint e lê-a em voz alta no final do
+          evento.
+        </p>
+        <p class="gamificacao-porque">
+          <strong>Porque funciona:</strong> reforça a colaboração e termina a
+          retrospetiva com uma nota positiva.
+        </p>
+      </div>
+    </div>
+
+    <h4>🧪 Experimenta: votação por pontos</h4>
+    <p>
+      Imagina que a tua equipa levantou estes temas na retrospetiva. Tens
+      3 pontos: distribui-os pelos temas que achas mais importantes
+      melhorar. Depois, uma segunda pessoa pode votar no mesmo ecrã ou
+      podes simular o voto de um colega — no fim vês o total da equipa e
+      qual sai como prioridade.
+    </p>
+
+    ${renderVotacaoPontos(
+      "sprint-retrospective",
+      [
+        "Reuniões demasiado longas",
+        "Falta de clareza nos requisitos",
+        "Comunicação dentro da equipa",
+        "Testes feitos à pressa",
+        "Ferramentas pouco práticas",
+      ],
+      3
+    )}
+
+    <p class="gamificacao-aviso">
+      ⚠️ <strong>Atenção:</strong> a gamificação deve recompensar a
+      colaboração e a melhoria da equipa, nunca criar rankings ou
+      competição entre pessoas. Numa retrospetiva, o "prémio" é a equipa
+      funcionar melhor.
+    </p>
+  </section>
+
+  ${renderMiniQuiz("sprint-retrospective", "Sprint Retrospective", [
+    {
+      enunciado: "Qual é o principal objetivo da Sprint Retrospective?",
+      opcoes: [
+        "Mostrar o Incremento aos stakeholders",
+        "Definir o Sprint Goal da sprint seguinte",
+        "Identificar melhorias na forma de trabalhar da equipa",
+      ],
+      correta: 2,
+    },
+    {
+      enunciado: "Quem participa na Sprint Retrospective?",
+      opcoes: [
+        "A Scrum Team: Product Owner, Scrum Master e Equipa de Desenvolvimento",
+        "Apenas o Scrum Master",
+        "A Scrum Team e todos os stakeholders externos",
+      ],
+      correta: 0,
+    },
+    {
+      enunciado: "Qual é um resultado típico da Sprint Retrospective?",
+      opcoes: [
+        "Um novo roadmap da release",
+        "Ações de melhoria concretas para a sprint seguinte",
+        "A avaliação do desempenho individual de cada elemento",
+      ],
+      correta: 1,
+    },
+  ])}
+`;
+
  
 // Depois de os painéis serem inseridos no DOM (ver main.js), inicializa os
 // mini-quizzes e atividades interativas das etapas que já têm conteúdo
@@ -826,5 +1200,6 @@ function inicializarConteudoEtapas() {
   Object.keys(CONTEUDO_ETAPAS).forEach((id) => inicializarMiniQuiz(id));
   inicializarScrumPoker("sprint-planning");
   inicializarPopups();
+  inicializarVotacaoPontos("sprint-retrospective");
 }
  
