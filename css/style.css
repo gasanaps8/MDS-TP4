@@ -558,11 +558,6 @@ button {
   }
 }
 
-.tab-nav-btn:hover {
-  border-color: var(--verde);
-  color: var(--verde);
-}
-
 .painel-etapas {
   margin-top: 1rem;
 }
