@@ -36,19 +36,21 @@
       </div>
     </section>
 
-    <!-- US-06: conteúdo da etapa selecionada no mapa acima, com navegação
-         anterior/seguinte. O mapa de etapas funciona como as tabs. -->
+    <!-- US-06: navegação entre etapas -->
     <section id="conteudo-etapa" class="conteudo-etapa">
+      <div id="painel-etapas" class="painel-etapas"></div>
+
       <div class="tabs-nav">
-        <button type="button" id="tab-anterior" class="tab-nav-btn" aria-label="Etapa anterior">
-          &#8249;
+        <button type="button" id="tab-anterior" class="tab-nav-btn">
+          <span>&#8592;</span>
+          Etapa Anterior
         </button>
-        <p class="tabs-nav-dica">Usa as setas ou clica numa etapa acima</p>
-        <button type="button" id="tab-seguinte" class="tab-nav-btn" aria-label="Etapa seguinte">
-          &#8250;
+
+        <button type="button" id="tab-seguinte" class="tab-nav-btn">
+          Etapa Seguinte
+          <span>&#8594;</span>
         </button>
       </div>
-      <div id="painel-etapas" class="painel-etapas"></div>
     </section>
   </main>
 
